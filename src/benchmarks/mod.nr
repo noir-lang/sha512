@@ -14,7 +14,7 @@ use crate::permutation::digest;
 // note: a lot of cost overhead vs compression algorithm. A lot of this will be witness extension, but maybe there are overheads we can cut?
 #[export]
 fn bench_digest(input: [u8; 128]) {
-    let result = digest(input);
+    let result = digest::<_, 1>(input);
 
     let expected: [u8; 64] = [
         0xcf, 0x83, 0xe1, 0x35, 0x7e, 0xef, 0xb8, 0xbd, 0xf1, 0x54, 0x28, 0x50, 0xd6, 0x6d, 0x80,
