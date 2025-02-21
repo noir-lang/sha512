@@ -1,5 +1,8 @@
 # sha512
 
+> [!WARNING]  
+> This library has not been reviewed by the Noir team and is unaudited. Use at your own risk.
+
 Library that implements SHA512 and SHA384
 
 ## Noir version compatibility
