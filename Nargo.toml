@@ -1,5 +1,5 @@
 [package]
-name = "noir_library"
+name = "sha512"
 type = "lib"
 authors = [""]
 compiler_version = ">=0.34.0"
