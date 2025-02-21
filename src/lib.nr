@@ -3,7 +3,7 @@ mod tables;
 mod encoding;
 mod benchmarks;
 
-mod sha512 {
+pub mod sha512 {
     pub fn digest<let N: u32>(msg: [u8; N]) -> [u8; 64] {
         crate::permutation::digest::<_, 1>(msg)
     }
@@ -89,7 +89,7 @@ mod sha512 {
 
 }
 
-mod sha384 {
+pub mod sha384 {
     pub fn digest<let N: u32>(msg: [u8; N]) -> [u8; 48] {
         let full_result = crate::permutation::digest::<_, 0>(msg);
         let mut r: [u8; 48] = [0; 48];
