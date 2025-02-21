@@ -410,7 +410,7 @@ global SHA512_LENGTH_PARAMETER_BYTES: u32 = 16;
 global SHA512_BLOCK_SIZE: u32 = 128;
 
 // SHA-512/SHA-384 hash function
-pub fn digest<let N: u32, let IS_SHA512: u1>(msg: [u8; N]) -> [u8; 64] {
+pub(crate) fn digest<let N: u32, let IS_SHA512: u1>(msg: [u8; N]) -> [u8; 64] {
     // noir-fmt:ignore
     let mut h: [u64; 8] = if IS_SHA512 == 1 {
         SHA512_INITIAL_HASH_VALUES
@@ -463,7 +463,7 @@ pub fn digest<let N: u32, let IS_SHA512: u1>(msg: [u8; N]) -> [u8; 64] {
     out_h
 }
 
-pub fn digest_var<let N: u32, let IS_SHA512: u1>(msg: BoundedVec<u8, N>) -> [u8; 64] {
+pub(crate) fn digest_var<let N: u32, let IS_SHA512: u1>(msg: BoundedVec<u8, N>) -> [u8; 64] {
     // noir-fmt:ignore
     let mut h: [u64; 8] = if IS_SHA512 == 1 {
         SHA512_INITIAL_HASH_VALUES
