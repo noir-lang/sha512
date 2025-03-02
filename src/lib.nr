@@ -1,15 +1,199 @@
 mod permutation;
 mod tables;
+mod generate_tables;
 mod encoding;
 mod benchmarks;
+mod formatting;
 
+use crate::encoding::{encode_a, encode_e};
+use crate::formatting::{msg_u8_to_u64, reduce_modulo_64, to_u64};
+use crate::permutation::{compress, extend_message, RoundState};
+use crate::tables::{SHA384_INITIAL_HASH_VALUES, SHA512_INITIAL_HASH_VALUES};
+pub global SHA512_LENGTH_PARAMETER_BYTES: u32 = 16;
+
+// Size of the message block when packed as 8-byte integer array.
+pub global SHA512_BLOCK_SIZE: u32 = 128;
+
+global INT_BLOCK_SIZE: u32 = 16;
+type INT_BLOCK = [u64; INT_BLOCK_SIZE];
+
+// The state accumulates the blocks.
+// Its overall size is the same as the `HASH`.
+type STATE = [u64; 8];
+
+/**
+ * @brief sha512 compression function
+ * @details We expose this as a public method because the compression fn is needed if the user desires to evaluate a partial hash.
+ *          Interface is compatible with SHA512 from the stdlib
+ **/
+pub fn sha512_compression(_input: INT_BLOCK, _state: STATE) -> STATE {
+    let mut message_input: [Field; 16] = [0; 16];
+    for i in 0..16 {
+        message_input[i] = _input[i] as Field;
+    }
+
+    let mut state: RoundState = RoundState {
+        a: encode_a(_state[0] as Field),
+        b: encode_a(_state[1] as Field),
+        c: encode_a(_state[2] as Field),
+        d: encode_a(_state[3] as Field),
+        e: encode_e(_state[4] as Field),
+        f: encode_e(_state[5] as Field),
+        g: encode_e(_state[6] as Field),
+        h: encode_e(_state[7] as Field),
+    };
+
+    let mut w: [Field; 80] = extend_message(message_input);
+
+    compress(&mut state, w);
+
+    let mut output: STATE = [0; 8];
+    output[0] = to_u64(state.a.raw);
+    output[1] = to_u64(state.b.raw);
+    output[2] = to_u64(state.c.raw);
+    output[3] = to_u64(state.d.raw);
+    output[4] = to_u64(state.e.raw);
+    output[5] = to_u64(state.f.raw);
+    output[6] = to_u64(state.g.raw);
+    output[7] = to_u64(state.h.raw);
+    output
+}
+
+/**
+ * @brief The SHA384/SHA512 hash function.
+ * @details Input is the message to be hashed, produces a 64-byte output
+ *          The `IS_SHA512` generic is used to toggle whether a SHA384 or SHA512 hash is desired
+ *  (the only diff between SHA384/SHA512 are different initial starting constants, and the SHA384 hash output is truncated)
+ **/
+fn digest<let N: u32, let IS_SHA512: u1>(msg: [u8; N]) -> [u8; 64] {
+    // noir-fmt:ignore
+    let mut h: [u64; 8] = if IS_SHA512 == 1 {
+        SHA512_INITIAL_HASH_VALUES
+    } else {
+        SHA384_INITIAL_HASH_VALUES
+    };
+    let mut c: [u64; 8] = [0; 8]; // Compression of current message block as sequence of u64
+    let mut out_h: [u8; 64] = [0; 64]; // Digest as sequence of bytes
+
+    let num_blocks = (N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE;
+
+    let num_padded_bytes = num_blocks * SHA512_BLOCK_SIZE;
+    let mut padded_msg: [u8; ((N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE) * SHA512_BLOCK_SIZE] = [
+        0; ((N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE)
+            * SHA512_BLOCK_SIZE
+    ];
+
+    for i in 0..N {
+        padded_msg[i] = msg[i];
+    }
+    padded_msg[N] = 128;
+    // N.B. assuming the message length (in bits) can be covered in 32 bits (approx 16MB message!)
+    let length_bytes = (N as Field * 8).to_le_bytes::<4>();
+    padded_msg[num_padded_bytes - 1] = length_bytes[0];
+    padded_msg[num_padded_bytes - 2] = length_bytes[1];
+    padded_msg[num_padded_bytes - 3] = length_bytes[2];
+    padded_msg[num_padded_bytes - 4] = length_bytes[3];
+
+    let mut block_bytes: [u8; 128] = [0; 128];
+    for i in 0..num_blocks {
+        for j in 0..128 {
+            block_bytes[j] = padded_msg[i * 128 + j];
+        }
+        c = sha512_compression(msg_u8_to_u64(block_bytes), h);
+        for j in 0..8 {
+            h[j] = to_u64(reduce_modulo_64(h[j] as Field + c[j] as Field));
+        }
+    }
+
+    // Return final hash as byte array
+    for j in 0..8 {
+        let h_bytes: [u8; 8] = (h[7 - j] as Field).to_le_bytes();
+        for k in 0..8 {
+            out_h[63 - 8 * j - k] = h_bytes[k];
+        }
+    }
+    out_h
+}
+
+/**
+ * @brief The SHA384/SHA512 hash function for a *variable length* input (up to a bounded maximum)
+ * @details Input is the message to be hashed, produces a 64-byte output
+ *          The `IS_SHA512` generic is used to toggle whether a SHA384 or SHA512 hash is desired
+ *  (the only diff between SHA384/SHA512 are different initial starting constants, and the SHA384 hash output is truncated)
+ **/
+fn digest_var<let N: u32, let IS_SHA512: u1>(msg: BoundedVec<u8, N>) -> [u8; 64] {
+    // noir-fmt:ignore
+    let mut h: [u64; 8] = if IS_SHA512 == 1 {
+        SHA512_INITIAL_HASH_VALUES
+    } else {
+        SHA384_INITIAL_HASH_VALUES
+    };
+    let mut c: [u64; 8] = [0; 8]; // Compression of current message block as sequence of u64
+    let mut out_h: [u8; 64] = [0; 64]; // Digest as sequence of bytes
+
+    let num_blocks = (N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE;
+
+    let mut padded_msg: [u8; ((N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE) * SHA512_BLOCK_SIZE] = [
+        0; ((N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE)
+            * SHA512_BLOCK_SIZE
+    ];
+
+    let msg_text = msg.storage();
+    for i in 0..N {
+        padded_msg[i] = msg_text[i];
+    }
+
+    let msg_length = msg.len();
+
+    let num_used_blocks =
+        (msg_length + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE;
+
+    let num_used_padded_bytes = num_used_blocks * SHA512_BLOCK_SIZE;
+    // N.B. this line turns `padded_msg` into a RAM array, which is expensive!
+    // The cost of this is roughly 7 * N gates.
+    // There are cheaper ways of doing this (e.g. pack into 8-byte field elements first, then update msg length),
+    // however the cost of the RAM array is small relative to the total cost of a hash, so not really worth the extra complexity
+    padded_msg[msg_length] = 128;
+    // N.B. we assume the message length (in bits) can be covered in 32 bits (approx 16MB message!)
+    let length_bytes = (msg_length as Field * 8).to_le_bytes::<4>();
+    padded_msg[num_used_padded_bytes - 1] = length_bytes[0];
+    padded_msg[num_used_padded_bytes - 2] = length_bytes[1];
+    padded_msg[num_used_padded_bytes - 3] = length_bytes[2];
+    padded_msg[num_used_padded_bytes - 4] = length_bytes[3];
+
+    let mut output_h: [u64; 8] = h;
+    let mut block_bytes: [u8; 128] = [0; 128];
+    for i in 0..num_blocks {
+        for j in 0..128 {
+            block_bytes[j] = padded_msg[i * 128 + j];
+        }
+        c = sha512_compression(msg_u8_to_u64(block_bytes), h);
+        for j in 0..8 {
+            h[j] = std::wrapping_add(h[j], c[j]);
+        }
+        if (i < num_used_blocks) {
+            output_h = h;
+        }
+    }
+
+    // Return final hash as byte array
+    for j in 0..8 {
+        let h_bytes: [u8; 8] = (output_h[7 - j] as Field).to_le_bytes();
+        for k in 0..8 {
+            out_h[63 - 8 * j - k] = h_bytes[k];
+        }
+    }
+    out_h
+}
+
+// methods here are interface-compatible with stdlib
 pub mod sha512 {
     pub fn digest<let N: u32>(msg: [u8; N]) -> [u8; 64] {
-        crate::permutation::digest::<_, 1>(msg)
+        crate::digest::<_, 1>(msg)
     }
 
     pub fn sha512_var<let N: u32>(msg: BoundedVec<u8, N>) -> [u8; 64] {
-        crate::permutation::digest_var::<_, 1>(msg)
+        crate::digest_var::<_, 1>(msg)
     }
     #[test]
     fn test_empty_string() {
@@ -89,9 +273,10 @@ pub mod sha512 {
 
 }
 
+// methods here are interface-compatible with stdlib
 pub mod sha384 {
     pub fn digest<let N: u32>(msg: [u8; N]) -> [u8; 48] {
-        let full_result = crate::permutation::digest::<_, 0>(msg);
+        let full_result = crate::digest::<_, 0>(msg);
         let mut r: [u8; 48] = [0; 48];
         for i in 0..48 {
             r[i] = full_result[i];
@@ -100,7 +285,7 @@ pub mod sha384 {
     }
 
     pub fn sha384_var<let N: u32>(msg: BoundedVec<u8, N>) -> [u8; 48] {
-        let full_result = crate::permutation::digest_var::<_, 0>(msg);
+        let full_result = crate::digest_var::<_, 0>(msg);
         let mut r: [u8; 48] = [0; 48];
         for i in 0..48 {
             r[i] = full_result[i];
