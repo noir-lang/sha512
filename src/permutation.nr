@@ -113,7 +113,7 @@ pub(crate) fn compress(state: &mut RoundState, w: [Field; 80]) {
 }
 
 mod test {
-    unconstrained fn extend_message_native(witness: [Field; 16]) -> [u64; 80] {
+    unconstrained fn __extend_message_native(witness: [Field; 16]) -> [u64; 80] {
         let mut w: [u64; 80] = [0; 80];
         for i in 0..16 {
             w[i] = witness[i] as u64;
@@ -139,7 +139,7 @@ mod test {
         }
         w
     }
-    unconstrained fn compress_native(witness: [Field; 80]) -> [Field; 8] {
+    unconstrained fn __compress_native(witness: [Field; 80]) -> [Field; 8] {
         let mut expected: [Field; 8] = [0; 8];
 
         let mut a: u64 = crate::tables::SHA512_INITIAL_HASH_VALUES[0];
@@ -210,7 +210,7 @@ mod test {
 
         crate::permutation::compress(&mut state, witness);
         // Safety: get native result to compare against
-        let expected = unsafe { compress_native(witness) };
+        let expected = unsafe { __compress_native(witness) };
         assert_eq(state.a.raw, expected[0]);
         assert_eq(state.b.raw, expected[1]);
         assert_eq(state.c.raw, expected[2]);
@@ -230,7 +230,7 @@ mod test {
 
         let result = crate::permutation::extend_message(initial_witness);
         // Safety: get native result to compare against
-        let expected = unsafe { extend_message_native(initial_witness) };
+        let expected = unsafe { __extend_message_native(initial_witness) };
 
         for i in 0..80 {
             assert_eq(result[i], expected[i] as Field);

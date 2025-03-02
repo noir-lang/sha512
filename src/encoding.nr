@@ -84,7 +84,7 @@ unconstrained fn __split_into_base4_5bit_slices(encoded: Field) -> [Field; 13] {
 /**
  * @brief split an input Field element `e` (known to be 64 bits) into slices that can be efficiently composed to produce inputs to `EncodedChoose`
  **/
-unconstrained fn decompose_e(e: Field) -> [Field; 9] {
+unconstrained fn __decompose_e(e: Field) -> [Field; 9] {
     let mut r: [Field; 9] = [0; 9];
     let mut bytes = e.to_le_bytes::<8>();
     let b8to14 = bytes[1] & 63;
@@ -109,7 +109,7 @@ unconstrained fn decompose_e(e: Field) -> [Field; 9] {
 /**
  * @brief split an input Field element `a` (known to be 64 bits) into slices that can be efficiently composed to produce inputs to `EncodedMajority`
  **/
-unconstrained fn decompose_a(a: Field) -> [Field; 9] {
+unconstrained fn __decompose_a(a: Field) -> [Field; 9] {
     let mut r: [Field; 9] = [0; 9];
     let mut bytes = a.to_le_bytes::<8>();
     let b24to28 = bytes[3] & 15;
@@ -309,7 +309,7 @@ pub(crate) fn encode_e(e: Field) -> EncodedChoose {
     //        We need to validate the correctness of these slice claims by asserting their sum equals `a`,
     //        and we also need to validate the bit range of each slice
     //        (we get an implicit range constraint for free by indexing our BASE4_ENCODE_TABLE lookup tables)
-    let s = unsafe { decompose_e(e) };
+    let s = unsafe { __decompose_e(e) };
 
     // Validate the sum of the slices equals the original input `e`
     // Note: we range constrain the slices later on in the function
@@ -394,7 +394,7 @@ pub(crate) fn encode_a(a: Field) -> EncodedMajority {
     //        We need to validate the correctness of these slice claims by asserting their sum equals `a`,
     //        and we also need to validate the bit range of each slice
     //        (we get an implicit range constraint for free by indexing our BASE4_ENCODE_TABLE lookup tables)
-    let s = unsafe { decompose_a(a) };
+    let s = unsafe { __decompose_a(a) };
 
     // Validate the sum of the slices equals the original input `e`
     // Note: we range constrain the slices later on in the function

@@ -33,7 +33,7 @@ unconstrained fn compute_base4_conversion_table<let TABLE_ENTRIES: u32>() -> [u3
     table
 }
 
-unconstrained fn compute_xor_decoding_table() {
+unconstrained fn __compute_xor_decoding_table() {
     // num bits = 6
 
     let mut result: [Field; 4 * 4 * 4 * 4 * 4] = [0; 4 * 4 * 4 * 4 * 4];
@@ -86,7 +86,7 @@ unconstrained fn compute_xor_decoding_table() {
     );
 }
 
-unconstrained fn compute_partial_choose_decoding_table() {
+unconstrained fn __compute_partial_choose_decoding_table() {
     // num bits = 6
     // !e & g
     // 2e + g -> 1 maps to 0
@@ -140,7 +140,7 @@ unconstrained fn compute_partial_choose_decoding_table() {
     );
 }
 
-unconstrained fn compute_majority_decoding_table() {
+unconstrained fn __compute_majority_decoding_table() {
     // num bits = 6
 
     let mut result: [Field; 4 * 4 * 4 * 4 * 4] = [0; 4 * 4 * 4 * 4 * 4];
@@ -196,19 +196,19 @@ unconstrained fn compute_majority_decoding_table() {
 #[test]
 fn print_xor_decoding_table() {
     //Safety:
-    unsafe { compute_xor_decoding_table() };
+    unsafe { __compute_xor_decoding_table() };
 }
 
 #[test]
 fn print_partial_choose_decoding_table() {
     //Safety:
-    unsafe { compute_partial_choose_decoding_table() };
+    unsafe { __compute_partial_choose_decoding_table() };
 }
 
 #[test]
 fn print_majority_decoding_table() {
     //Safety:
-    unsafe { compute_majority_decoding_table() };
+    unsafe { __compute_majority_decoding_table() };
 }
 
 #[test]
