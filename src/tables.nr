@@ -427,7 +427,6 @@ pub global BASE4_XOR_DECODE_5BIT_TABLE: [Field; 1024] = [
     0x1c, 0x1d, 0x1c, 0x1d, 0x1e, 0x1f, 0x1e, 0x1f, 0x1c, 0x1d, 0x1c, 0x1d, 0x1e, 0x1f, 0x1e, 0x1f,
 ];
 
-
 pub global BASE4_ENCODE_1BIT_TABLE: [Field; 2] = [0, 1];
 pub global BASE4_ENCODE_2BIT_TABLE: [Field; 4] = [0, 1, 4, 5];
 pub global BASE4_ENCODE_3BIT_TABLE: [Field; 8] = [0, 1, 4, 5, 16, 17, 20, 21];
