@@ -5,7 +5,7 @@ use crate::tables::{
     BASE4_PARTIAL_CHOOSE_DECODE_5BIT_TABLE, BASE4_POWERS, BASE4_XOR_DECODE_5BIT_TABLE,
 };
 
-unconstrained fn __decompose_e(e: Field) -> [Field; 9] {
+unconstrained fn decompose_e(e: Field) -> [Field; 9] {
     let mut r: [Field; 9] = [0; 9];
     let mut bytes = e.to_le_bytes::<8>();
     let b8to14 = bytes[1] & 63;
@@ -27,37 +27,7 @@ unconstrained fn __decompose_e(e: Field) -> [Field; 9] {
     r
 }
 
-fn decompose_e(e: Field) -> [Field; 9] {
-    //Safety: split input into slices with the following bit sizes:
-    //        8,6,4,6,8,9,7,8,8
-    //        We need to validate the correctness of these slice claims by asserting their sum equals `a`,
-    //        and we also need to validate the bit range of each slice
-    //        (we get an implicit range constraint for free by indexing our BASE4_ENCODE_TABLE lookup tables)
-    let s = unsafe { __decompose_e(e) };
-
-    let mut reconstructed = s[8];
-    reconstructed *= 256;
-    reconstructed += s[7];
-    reconstructed *= 128;
-    reconstructed += s[6];
-    reconstructed *= 512;
-    reconstructed += s[5];
-    reconstructed *= 256;
-    reconstructed += s[4];
-    reconstructed *= 64;
-    reconstructed += s[3];
-    reconstructed *= 16;
-    reconstructed += s[2];
-    reconstructed *= 64;
-    reconstructed += s[1];
-    reconstructed *= 256;
-    reconstructed += s[0];
-    assert_eq(reconstructed, e); // 7 gates?
-
-    s
-}
-
-unconstrained fn __decompose_a(a: Field) -> [Field; 9] {
+unconstrained fn decompose_a(a: Field) -> [Field; 9] {
     let mut r: [Field; 9] = [0; 9];
     let mut bytes = a.to_le_bytes::<8>();
     let b24to28 = bytes[3] & 15;
@@ -98,38 +68,6 @@ unconstrained fn __decompose_a(a: Field) -> [Field; 9] {
     // 1000000
     */
 
-}
-
-fn decompose_a(a: Field) -> [Field; 9] {
-    //Safety: split input into slices with the following bit sizes:
-    //        8,8,8,4,6,5,9,8,8
-    //        We need to validate the correctness of these slice claims by asserting their sum equals `a`,
-    //        and we also need to validate the bit range of each slice
-    //        (we get an implicit range constraint for free by indexing our BASE4_ENCODE_TABLE lookup tables)
-    let s = unsafe { __decompose_a(a) };
-
-    // 8,8,8,4,6,5,9,8,8
-    // 7 gates?
-    let mut reconstructed = s[8];
-    reconstructed *= 256;
-    reconstructed += s[7];
-    reconstructed *= 512;
-    reconstructed += s[6];
-    reconstructed *= 32;
-    reconstructed += s[5];
-    reconstructed *= 64;
-    reconstructed += s[4];
-    reconstructed *= 16;
-    reconstructed += s[3];
-    reconstructed *= 256;
-    reconstructed += s[2];
-    reconstructed *= 256;
-    reconstructed += s[1];
-    reconstructed *= 256;
-    reconstructed += s[0];
-    assert_eq(reconstructed, a);
-
-    s
 }
 
 pub(crate) struct EncodedMajority {
@@ -203,42 +141,6 @@ unconstrained fn __decompose_witness(w: Field) -> [Field; 12] {
     acc >>= 9;
     r[11] = (acc & 7) as Field;
     r
-}
-
-fn decompose_witness(w: Field) -> [Field; 12] {
-    //Safety: split input into slices with the following bit sizes:
-    //   1, 5, 1, 1, 8, 3, 8, 8, 8, 9, 9, 3
-    //        We need to validate the correctness of these slice claims by asserting their sum equals `w`,
-    //        and we also need to validate the bit range of each slice
-    //        (we get an implicit range constraint for free by indexing our BASE4_ENCODE_TABLE lookup tables)
-    let s: [Field; 12] = unsafe { __decompose_witness(w) };
-
-    let mut reconstructed = s[11];
-    reconstructed *= 512;
-    reconstructed += s[10];
-    reconstructed *= 512;
-    reconstructed += s[9];
-    reconstructed *= 256;
-    reconstructed += s[8];
-    reconstructed *= 256;
-    reconstructed += s[7];
-    reconstructed *= 256;
-    reconstructed += s[6];
-    reconstructed *= 8;
-    reconstructed += s[5];
-    reconstructed *= 256;
-    reconstructed += s[4];
-    reconstructed *= 2;
-    reconstructed += s[3];
-    reconstructed *= 2;
-    reconstructed += s[2];
-    reconstructed *= 32;
-    reconstructed += s[1];
-    reconstructed *= 2;
-    reconstructed += s[0];
-    assert_eq(reconstructed, w);
-
-    s
 }
 
 // unconstrained fn __decompose_w15(w15: Field) -> [Field; 10] {
@@ -361,7 +263,37 @@ fn decompose_witness(w: Field) -> [Field; 12] {
 // }
 
 pub(crate) fn encode_message_extension(w: Field) -> EncodedWitness {
-    let s: [Field; 12] = decompose_witness(w);
+    //Safety: split input into slices with the following bit sizes:
+    //   1, 5, 1, 1, 8, 3, 8, 8, 8, 9, 9, 3
+    //        We need to validate the correctness of these slice claims by asserting their sum equals `w`,
+    //        and we also need to validate the bit range of each slice
+    //        (we get an implicit range constraint for free by indexing our BASE4_ENCODE_TABLE lookup tables)
+    let s: [Field; 12] = unsafe { __decompose_witness(w) };
+
+    let mut reconstructed = s[11];
+    reconstructed *= 512;
+    reconstructed += s[10];
+    reconstructed *= 512;
+    reconstructed += s[9];
+    reconstructed *= 256;
+    reconstructed += s[8];
+    reconstructed *= 256;
+    reconstructed += s[7];
+    reconstructed *= 256;
+    reconstructed += s[6];
+    reconstructed *= 8;
+    reconstructed += s[5];
+    reconstructed *= 256;
+    reconstructed += s[4];
+    reconstructed *= 2;
+    reconstructed += s[3];
+    reconstructed *= 2;
+    reconstructed += s[2];
+    reconstructed *= 32;
+    reconstructed += s[1];
+    reconstructed *= 2;
+    reconstructed += s[0];
+    assert_eq(reconstructed, w);
 
     let mut base4_encoded_slices: [Field; 12] = [0; 12];
     //   1, 5, 1, 1, 8, 3, 8, 8, 8, 9, 9, 3
@@ -434,7 +366,31 @@ pub(crate) fn encode_message_extension(w: Field) -> EncodedWitness {
 }
 
 pub(crate) fn encode_e(e: Field) -> EncodedChoose {
-    let s = decompose_e(e);
+    //Safety: split input into slices with the following bit sizes:
+    //        8,6,4,6,8,9,7,8,8
+    //        We need to validate the correctness of these slice claims by asserting their sum equals `a`,
+    //        and we also need to validate the bit range of each slice
+    //        (we get an implicit range constraint for free by indexing our BASE4_ENCODE_TABLE lookup tables)
+    let s = unsafe { decompose_e(e) };
+
+    let mut reconstructed = s[8];
+    reconstructed *= 256;
+    reconstructed += s[7];
+    reconstructed *= 128;
+    reconstructed += s[6];
+    reconstructed *= 512;
+    reconstructed += s[5];
+    reconstructed *= 256;
+    reconstructed += s[4];
+    reconstructed *= 64;
+    reconstructed += s[3];
+    reconstructed *= 16;
+    reconstructed += s[2];
+    reconstructed *= 64;
+    reconstructed += s[1];
+    reconstructed *= 256;
+    reconstructed += s[0];
+    assert_eq(reconstructed, e); // 7 gates?
 
     // 8, 6, 4, 6, 8, 9, 7, 8, 8
 
@@ -493,7 +449,33 @@ pub(crate) fn encode_e(e: Field) -> EncodedChoose {
 }
 
 pub(crate) fn encode_a(a: Field) -> EncodedMajority {
-    let s = decompose_a(a);
+    //Safety: split input into slices with the following bit sizes:
+    //        8,8,8,4,6,5,9,8,8
+    //        We need to validate the correctness of these slice claims by asserting their sum equals `a`,
+    //        and we also need to validate the bit range of each slice
+    //        (we get an implicit range constraint for free by indexing our BASE4_ENCODE_TABLE lookup tables)
+    let s = unsafe { decompose_a(a) };
+
+    // 8,8,8,4,6,5,9,8,8
+    // 7 gates?
+    let mut reconstructed = s[8];
+    reconstructed *= 256;
+    reconstructed += s[7];
+    reconstructed *= 512;
+    reconstructed += s[6];
+    reconstructed *= 32;
+    reconstructed += s[5];
+    reconstructed *= 64;
+    reconstructed += s[4];
+    reconstructed *= 16;
+    reconstructed += s[3];
+    reconstructed *= 256;
+    reconstructed += s[2];
+    reconstructed *= 256;
+    reconstructed += s[1];
+    reconstructed *= 256;
+    reconstructed += s[0];
+    assert_eq(reconstructed, a);
 
     let mut base4_encoded_slices: [Field; 9] = [0; 9];
     // 18 gates?
