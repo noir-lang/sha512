@@ -200,7 +200,6 @@ pub(crate) fn encode_message_extension(w: Field) -> EncodedWitness {
     reconstructed += s[1];
     reconstructed *= 2;
     reconstructed += s[0];
-    // 4 gates
     assert_eq(reconstructed, w);
 
     let mut base4_encoded_slices: [Field; 12] = [0; 12];
@@ -415,7 +414,6 @@ pub(crate) fn encode_a(a: Field) -> EncodedMajority {
     reconstructed += s[1];
     reconstructed *= 256;
     reconstructed += s[0];
-    // relation has 10 terms = 4 add gates
     assert_eq(reconstructed, a);
 
     let mut base4_encoded_slices: [Field; 9] = [0; 9];
