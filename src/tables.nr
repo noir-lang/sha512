@@ -169,25 +169,25 @@ pub global BASE4_POWERS: [Field; 64] = [
     0x40000000000000000000000000000000,
 ];
 
-/**
- * BASE4_PARTIAL_CHOOSE_DECODE_5BIT_TABLE is a map that takes an input represented as: 
- *      input = \sum_{i=0}^{i<5} 4^i b_i
- * and produces an output represented as:
- *      output = \sum_{i=0}^{i<5} 2^i r_i
- *
- * where the map between b_i and r_i is the following:
- *
- * | b_i | r_i |
- * | --- | --- |
- * |   0 |   0 |
- * |   1 |   1 |
- * |   2 |   0 |
- * |   3 |   0 |
- *
- * Purpose of the table is to evaluate the relation (!e ^ g).
- * Both `e` and `g` are encoded in the base4 basis and the linear relation `2e + g` is used as input to this table.
- * The table crates an isomorphic map between `2e + g` in the base4 basis and `!e ^ g` in the base2 basis
- **/
+///
+/// BASE4_PARTIAL_CHOOSE_DECODE_5BIT_TABLE is a map that takes an input represented as:
+///      input = \sum_{i=0}^{i<5} 4^i b_i
+/// and produces an output represented as:
+///      output = \sum_{i=0}^{i<5} 2^i r_i
+///
+/// where the map between b_i and r_i is the following:
+///
+/// | b_i | r_i |
+/// | --- | --- |
+/// |   0 |   0 |
+/// |   1 |   1 |
+/// |   2 |   0 |
+/// |   3 |   0 |
+///
+/// Purpose of the table is to evaluate the relation (!e ^ g).
+/// Both `e` and `g` are encoded in the base4 basis and the linear relation `2e + g` is used as input to this table.
+/// The table crates an isomorphic map between `2e + g` in the base4 basis and `!e ^ g` in the base2 basis
+///
 pub global BASE4_PARTIAL_CHOOSE_DECODE_5BIT_TABLE: [Field; 1024] = [
     0x00, 0x01, 0x00, 0x00, 0x02, 0x03, 0x02, 0x02, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
     0x04, 0x05, 0x04, 0x04, 0x06, 0x07, 0x06, 0x06, 0x04, 0x05, 0x04, 0x04, 0x04, 0x05, 0x04, 0x04,
@@ -255,25 +255,25 @@ pub global BASE4_PARTIAL_CHOOSE_DECODE_5BIT_TABLE: [Field; 1024] = [
     0x00, 0x01, 0x00, 0x00, 0x02, 0x03, 0x02, 0x02, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
 ];
 
-/**
- * BASE4_MAJORITY_DECODE_5BIT_TABLE is a map that takes an input represented as: 
- *      input = \sum_{i=0}^{i<5} 4^i b_i
- * and produces an output represented as:
- *      output = \sum_{i=0}^{i<5} 2^i r_i
- *
- * where the map between b_i and r_i is the following:
- *
- * | b_i | r_i |
- * | --- | --- |
- * |   0 |   0 |
- * |   1 |   0 |
- * |   2 |   1 |
- * |   3 |   1 |
- *
- * Purpose of the table is to evaluate the relation (a & b) ^ (a & c) ^ (b & c)
- * All of `a, b, c` are encoded in the base4 basis and the linear relation `a + b + c` is used as input to this table.
- * The table crates an isomorphic map between `a + b + c` in the base4 basis and `(a & b) ^ (a & c) ^ (b & c)` in the base2 basis
- **/
+///
+/// BASE4_MAJORITY_DECODE_5BIT_TABLE is a map that takes an input represented as:
+///      input = \sum_{i=0}^{i<5} 4^i b_i
+/// and produces an output represented as:
+///      output = \sum_{i=0}^{i<5} 2^i r_i
+///
+/// where the map between b_i and r_i is the following:
+///
+/// | b_i | r_i |
+/// | --- | --- |
+/// |   0 |   0 |
+/// |   1 |   0 |
+/// |   2 |   1 |
+/// |   3 |   1 |
+///
+/// Purpose of the table is to evaluate the relation (a & b) ^ (a & c) ^ (b & c)
+/// All of `a, b, c` are encoded in the base4 basis and the linear relation `a + b + c` is used as input to this table.
+/// The table crates an isomorphic map between `a + b + c` in the base4 basis and `(a & b) ^ (a & c) ^ (b & c)` in the base2 basis
+///
 pub global BASE4_MAJORITY_DECODE_5BIT_TABLE: [Field; 1024] = [
     0x00, 0x00, 0x01, 0x01, 0x00, 0x00, 0x01, 0x01, 0x02, 0x02, 0x03, 0x03, 0x02, 0x02, 0x03, 0x03,
     0x00, 0x00, 0x01, 0x01, 0x00, 0x00, 0x01, 0x01, 0x02, 0x02, 0x03, 0x03, 0x02, 0x02, 0x03, 0x03,
@@ -341,25 +341,25 @@ pub global BASE4_MAJORITY_DECODE_5BIT_TABLE: [Field; 1024] = [
     0x1c, 0x1c, 0x1d, 0x1d, 0x1c, 0x1c, 0x1d, 0x1d, 0x1e, 0x1e, 0x1f, 0x1f, 0x1e, 0x1e, 0x1f, 0x1f,
 ];
 
-/**
- * BASE4_XOR_DECODE_5BIT_TABLE is a map that takes an input represented as: 
- *      input = \sum_{i=0}^{i<5} 4^i b_i
- * and produces an output represented as:
- *      output = \sum_{i=0}^{i<5} 2^i r_i
- *
- * where the map between b_i and r_i is the following:
- *
- * | b_i | r_i |
- * | --- | --- |
- * |   0 |   0 |
- * |   1 |   1 |
- * |   2 |   0 |
- * |   3 |   1 |
- *
- * Purpose of the table is to evaluate the relation a ^ b ^ c
- * All of `a, b, c` are encoded in the base4 basis and the linear relation `a + b + c` is used as input to this table.
- * The table crates an isomorphic map between `a + b + c` in the base4 basis and `a ^ b ^ c` in the base2 basis
- **/
+///
+/// BASE4_XOR_DECODE_5BIT_TABLE is a map that takes an input represented as:
+///      input = \sum_{i=0}^{i<5} 4^i b_i
+/// and produces an output represented as:
+///      output = \sum_{i=0}^{i<5} 2^i r_i
+///
+/// where the map between b_i and r_i is the following:
+///
+/// | b_i | r_i |
+/// | --- | --- |
+/// |   0 |   0 |
+/// |   1 |   1 |
+/// |   2 |   0 |
+/// |   3 |   1 |
+///
+/// Purpose of the table is to evaluate the relation a ^ b ^ c
+/// All of `a, b, c` are encoded in the base4 basis and the linear relation `a + b + c` is used as input to this table.
+/// The table crates an isomorphic map between `a + b + c` in the base4 basis and `a ^ b ^ c` in the base2 basis
+///
 pub global BASE4_XOR_DECODE_5BIT_TABLE: [Field; 1024] = [
     0x00, 0x01, 0x00, 0x01, 0x02, 0x03, 0x02, 0x03, 0x00, 0x01, 0x00, 0x01, 0x02, 0x03, 0x02, 0x03,
     0x04, 0x05, 0x04, 0x05, 0x06, 0x07, 0x06, 0x07, 0x04, 0x05, 0x04, 0x05, 0x06, 0x07, 0x06, 0x07,

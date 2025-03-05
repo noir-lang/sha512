@@ -5,13 +5,12 @@ use crate::tables::{
     BASE4_PARTIAL_CHOOSE_DECODE_5BIT_TABLE, BASE4_POWERS, BASE4_XOR_DECODE_5BIT_TABLE,
 };
 
-/**
- * @brief encodes the u64 inputs to the `Majority` function in an extended Base4 represeentation
- * @param raw: the input 64-bit limb
- * @param encoded: `raw` but where every bit is represented as a base4 value (e.g. encoded = \sum 4^i b_i, where `b_i` represents the i'th bit of `raw`)
- * @param rotate_sum: the base-4 encoding of `encode(raw.rotate28) + encode(raw.rotate34) + encode(raw.rotate39)`
- *        we use the fact that the map between rotate_sum and `raw.rotate28 ^ raw.rotate34 ^ raw.rotate39` is injective
- **/
+/// Encodes the u64 inputs to the `Majority` function in an extended Base4 represeentation
+///
+/// *param* raw: the input 64-bit limb
+/// *param* encoded: `raw` but where every bit is represented as a base4 value (e.g. encoded = \sum 4^i b_i, where `b_i` represents the i'th bit of `raw`)
+/// *param* rotate_sum: the base-4 encoding of `encode(raw.rotate28) + encode(raw.rotate34) + encode(raw.rotate39)`
+///         we use the fact that the map between rotate_sum and `raw.rotate28 ^ raw.rotate34 ^ raw.rotate39` is injective
 pub(crate) struct EncodedMajority {
     pub(crate) raw: Field,
     pub(crate) encoded: Field,
@@ -23,13 +22,11 @@ impl EncodedMajority {
     }
 }
 
-/**
- * @brief encodes the u64 inputs to the `Choose` function in an extended Base4 represeentation
- * @param raw: the input 64-bit limb
- * @param encoded: `raw` but where every bit is represented as a base4 value (e.g. encoded = \sum 4^i b_i, where `b_i` represents the i'th bit of `raw`)
- * @param rotate_sum: the base-4 encoding of `encode(raw.rotate14) + encode(raw.rotate18) + encode(raw.rotate41)`
- *        we use the fact that the map between rotate_sum and `raw.rotate14 ^ raw.rotate18 ^ raw.rotate41` is injective
- **/
+///  encodes the u64 inputs to the `Choose` function in an extended Base4 represeentation
+/// *param* raw: the input 64-bit limb
+/// *param* encoded: `raw` but where every bit is represented as a base4 value (e.g. encoded = \sum 4^i b_i, where `b_i` represents the i'th bit of `raw`)
+/// *param* rotate_sum: the base-4 encoding of `encode(raw.rotate14) + encode(raw.rotate18) + encode(raw.rotate41)`
+///        we use the fact that the map between rotate_sum and `raw.rotate14 ^ raw.rotate18 ^ raw.rotate41` is injective
 pub(crate) struct EncodedChoose {
     pub(crate) raw: Field,
     pub(crate) encoded: Field,
@@ -41,17 +38,13 @@ impl EncodedChoose {
     }
 }
 
-//     assert_eq(decoded_w2_rotate_sum, (w_ror19 ^ w_ror61 ^ w_rshift6) as Field);
-//  assert_eq(decoded_w15_rotate_sum, (w_ror1 ^ w_ror8 ^ w_rshift7) as Field);
+/// Encodes the u64 message limbs in a base4 representation, as well as the sum of the rotated components required for witness extension
 
-/**
- * @brief encodes the u64 message limbs in a base4 representation, as well as the sum of the rotated components required for witness extension
- * @param raw : the input 64-bit limb
- * @param w : `raw` but where every bit is represented as a base4 value (e.g. encoded = \sum 4^i b_i, where `b_i` represents the i'th bit of `raw`)
- * @param w2_rotate_sum : the base-4 encoding of `encode(raw.rotate19) + encode(raw.rotate61) + encode(raw >> 6)`
- * @param w15_rotate_sum : the base-4 encoding of `encode(raw.rotate1) + encode(raw.rotate8) + encode(raw >> 7)`
- *        like with EncodedChoose and EncodedMajority, there is an injective map between `w2_rotate_sum`/`w15_rotate_sum` and the base-2 bitwise operations required for message extension
- **/
+/// *param* raw : the input 64-bit limb
+/// *param* w : `raw` but where every bit is represented as a base4 value (e.g. encoded = \sum 4^i b_i, where `b_i` represents the i'th bit of `raw`)
+/// *param* w2_rotate_sum : the base-4 encoding of `encode(raw.rotate19) + encode(raw.rotate61) + encode(raw >> 6)`
+/// *param* w15_rotate_sum : the base-4 encoding of `encode(raw.rotate1) + encode(raw.rotate8) + encode(raw >> 7)`
+///        like with EncodedChoose and EncodedMajority, there is an injective map between `w2_rotate_sum`/`w15_rotate_sum` and the base-2 bitwise operations required for message extension
 pub(crate) struct EncodedWitness {
     pub(crate) raw: Field,
     pub(crate) w: Field,
@@ -65,9 +58,7 @@ impl EncodedWitness {
     }
 }
 
-/**
- * @brief take an input that is a u64 encoded via base4, and split it into 5-bit slices encoded via base64
- **/
+/// Take an input that is a u64 encoded via base4, and split it into 5-bit slices encoded via base64
 unconstrained fn __split_into_base4_5bit_slices(encoded: Field) -> [Field; 13] {
     let mut acc = encoded as u128;
 
@@ -81,9 +72,7 @@ unconstrained fn __split_into_base4_5bit_slices(encoded: Field) -> [Field; 13] {
     slices
 }
 
-/**
- * @brief split an input Field element `e` (known to be 64 bits) into slices that can be efficiently composed to produce inputs to `EncodedChoose`
- **/
+/// Split an input Field element `e` (known to be 64 bits) into slices that can be efficiently composed to produce inputs to `EncodedChoose`
 unconstrained fn __decompose_e(e: Field) -> [Field; 9] {
     let mut r: [Field; 9] = [0; 9];
     let mut bytes = e.to_le_bytes::<8>();
@@ -106,9 +95,7 @@ unconstrained fn __decompose_e(e: Field) -> [Field; 9] {
     r
 }
 
-/**
- * @brief split an input Field element `a` (known to be 64 bits) into slices that can be efficiently composed to produce inputs to `EncodedMajority`
- **/
+/// Split an input Field element `a` (known to be 64 bits) into slices that can be efficiently composed to produce inputs to `EncodedMajority`
 unconstrained fn __decompose_a(a: Field) -> [Field; 9] {
     let mut r: [Field; 9] = [0; 9];
     let mut bytes = a.to_le_bytes::<8>();
@@ -129,11 +116,10 @@ unconstrained fn __decompose_a(a: Field) -> [Field; 9] {
     r
 }
 
-/**
- * @brief split an input Field element `w` (known to be 64 bits) into slices that can be efficiently composed to produce inputs to `EncodedWitness`
- **/
+/// Split an input Field element `w` (known to be 64 bits) into slices that can be efficiently composed to produce inputs to `EncodedWitness`
 unconstrained fn __decompose_witness(w: Field) -> [Field; 12] {
-    //   1, 5, 1, 1, 8, 3, 8, 8, 8, 9, 9, 3
+    // bit slice structure is:
+    // 1, 5, 1, 1, 8, 3, 8, 8, 8, 9, 9, 3
     let mut acc: u64 = w as u64;
     let mut r: [Field; 12] = [0; 12];
 
@@ -163,10 +149,10 @@ unconstrained fn __decompose_witness(w: Field) -> [Field; 12] {
     r
 }
 
-/**
- * @brief take an input field element `w`, known to be 64-bits, and convert into an EncodedWitness member
- * @details cost = 40 gates
- **/
+/// Take an input field element `w`, known to be 64-bits, and convert into an EncodedWitness member
+///
+/// # Cost
+/// 40 gates
 pub(crate) fn encode_message_extension(w: Field) -> EncodedWitness {
     //Safety: split input into slices with the following bit sizes:
     //   1, 5, 1, 1, 8, 3, 8, 8, 8, 9, 9, 3
@@ -298,10 +284,10 @@ pub(crate) fn encode_message_extension(w: Field) -> EncodedWitness {
     EncodedWitness { raw: w, w: ror0, w2_rotate_sum, w15_rotate_sum }
 }
 
-/**
- * @brief take an input field element `e`, known to be 64-bits, and convert into an EncodedChoose member
- * @details cost = 27 gates
- **/
+/// Take an input field element `e`, known to be 64-bits, and convert into an EncodedChoose member
+///
+/// # Cost
+/// 27 gates
 pub(crate) fn encode_e(e: Field) -> EncodedChoose {
     //Safety: split input into slices with the following bit sizes:
     //        8,6,4,6,8,9,7,8,8
@@ -383,10 +369,10 @@ pub(crate) fn encode_e(e: Field) -> EncodedChoose {
     EncodedChoose { raw: e, encoded: e_ror0, rotate_sum: e_ror_sum }
 }
 
-/**
- * @brief take an input field element `a`, known to be 64-bits, and convert into an EncodedMajority member
- * @details cost = 27 gates
- **/
+/// Take an input field element `a`, known to be 64-bits, and convert into an EncodedMajority member
+///
+/// # Cost
+/// 27 gates
 pub(crate) fn encode_a(a: Field) -> EncodedMajority {
     //Safety: split input into slices with the following bit sizes:
     //        8,8,8,4,6,5,9,8,8
@@ -467,11 +453,10 @@ pub(crate) fn encode_a(a: Field) -> EncodedMajority {
     EncodedMajority { raw: a, encoded: a_ror0, rotate_sum: a_ror_sum }
 }
 
-/**
- * @brief given three Field inputs `a, b, c`, known to be 64-bit values encoded as base4 numbers,
- *        evaluate the SHA384/512 majority function `(a and b) xor (a and c) xor (b and c)`
- * @details the return parameter is a base-2 value
- **/
+/// Given three Field inputs `a, b, c`, known to be 64-bit values encoded as base4 numbers,
+/// evaluate the SHA384/512 majority function `(a and b) xor (a and c) xor (b and c)`
+///
+/// Note: the return parameter is a base-2 value
 pub(crate) fn decode_majority(a: Field, b: Field, c: Field) -> Field {
     // adding base4 basis numbers produces an injective map vs computing (a&b)^(a&c)^(b&c) in the base2 basis
     // e.g. each base4 "bit" in `encoded` will be either 0, 1, 2 or 3
@@ -505,11 +490,10 @@ pub(crate) fn decode_majority(a: Field, b: Field, c: Field) -> Field {
     decoded
 }
 
-/**
- * @brief given three Field inputs `e, f, g`, known to be 64-bit values encoded as base4 numbers,
- *        evaluate the SHA384/512 choose function `(e & f) ^ (!e & g)`
- * @details the return parameter is a base-2 value
- **/
+/// Given three Field inputs `e, f, g`, known to be 64-bit values encoded as base4 numbers,
+/// evaluate the SHA384/512 choose function `(e & f) ^ (!e & g)`
+///
+/// Note: the return parameter is a base-2 value
 pub(crate) fn decode_choose(e: Field, f: Field, g: Field) -> Field {
     // Note: unlike in `decode_majority`, there is not a nice injective map between
     // a linear relation between base4-encoded values and the bitwise operation over base2 values.
@@ -577,10 +561,9 @@ pub(crate) fn decode_choose(e: Field, f: Field, g: Field) -> Field {
     decoded_lhs + decoded_rhs
 }
 
-/**
- * @brief given an input `encoded` that is a linear sum of base4 elements, map into a base2 number which is a linear XOR of the same elements
- * @details e.g. if `encoded = a + b + c` in base4, the return value will be a ^ b ^ c in base2 
- **/
+/// Given an input `encoded` that is a linear sum of base4 elements, map into a base2 number which is a linear XOR of the same elements
+///
+/// e.g. if `encoded = a + b + c` in base4, the return value will be a ^ b ^ c in base2
 pub(crate) fn decode_xor(encoded: Field) -> Field {
     //Safety: split input into "5-bit" slices.
     //        Because the input is in base4, we actually obtain 10-bit slices

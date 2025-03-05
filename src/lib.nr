@@ -11,21 +11,20 @@ use crate::permutation::{compress, extend_message, RoundState};
 use crate::tables::{SHA384_INITIAL_HASH_VALUES, SHA512_INITIAL_HASH_VALUES};
 pub global SHA512_LENGTH_PARAMETER_BYTES: u32 = 16;
 
-// Size of the message block when packed as 8-byte integer array.
+/// Size of the message block when packed as 8-byte integer array.
 pub global SHA512_BLOCK_SIZE: u32 = 128;
 
 global INT_BLOCK_SIZE: u32 = 16;
 type INT_BLOCK = [u64; INT_BLOCK_SIZE];
 
-// The state accumulates the blocks.
-// Its overall size is the same as the `HASH`.
+/// The state accumulates the blocks.
+/// Its overall size is the same as the `HASH`.
 type STATE = [u64; 8];
 
-/**
- * @brief sha512 compression function
- * @details We expose this as a public method because the compression fn is needed if the user desires to evaluate a partial hash.
- *          Interface is compatible with SHA512 from the stdlib
- **/
+/// SHA512 compression function
+///
+/// We expose this as a public method because the compression fn is needed if the user desires to evaluate a partial hash.
+/// Interface is compatible with the sha256 blackbox fns
 pub fn sha512_compression(_input: INT_BLOCK, _state: STATE) -> STATE {
     let mut message_input: [Field; 16] = [0; 16];
     for i in 0..16 {
@@ -59,12 +58,11 @@ pub fn sha512_compression(_input: INT_BLOCK, _state: STATE) -> STATE {
     output
 }
 
-/**
- * @brief The SHA384/SHA512 hash function.
- * @details Input is the message to be hashed, produces a 64-byte output
- *          The `IS_SHA512` generic is used to toggle whether a SHA384 or SHA512 hash is desired
- *  (the only diff between SHA384/SHA512 are different initial starting constants, and the SHA384 hash output is truncated)
- **/
+/// The SHA384/SHA512 hash function
+///
+/// Input is the message to be hashed, produces a 64-byte output
+/// The `IS_SHA512` generic is used to toggle whether a SHA384 or SHA512 hash is desired
+/// (the only diff between SHA384/SHA512 are different initial starting constants, and the SHA384 hash output is truncated)
 fn digest<let N: u32, let IS_SHA512: u1>(msg: [u8; N]) -> [u8; 64] {
     // noir-fmt:ignore
     let mut h: [u64; 8] = if IS_SHA512 == 1 {
@@ -115,12 +113,12 @@ fn digest<let N: u32, let IS_SHA512: u1>(msg: [u8; N]) -> [u8; 64] {
     out_h
 }
 
-/**
- * @brief The SHA384/SHA512 hash function for a *variable length* input (up to a bounded maximum)
- * @details Input is the message to be hashed, produces a 64-byte output
- *          The `IS_SHA512` generic is used to toggle whether a SHA384 or SHA512 hash is desired
- *  (the only diff between SHA384/SHA512 are different initial starting constants, and the SHA384 hash output is truncated)
- **/
+/// The SHA384/SHA512 hash function for a *variable length* input (up to a bounded maximum)
+///
+/// Input is the message to be hashed, produces a 64-byte output
+/// The `IS_SHA512` generic is used to toggle whether a SHA384 or SHA512 hash is desired
+///
+/// (the only diff between SHA384/SHA512 are different initial starting constants, and the SHA384 hash output is truncated)
 fn digest_var<let N: u32, let IS_SHA512: u1>(msg: BoundedVec<u8, N>) -> [u8; 64] {
     // noir-fmt:ignore
     let mut h: [u64; 8] = if IS_SHA512 == 1 {
@@ -150,7 +148,7 @@ fn digest_var<let N: u32, let IS_SHA512: u1>(msg: BoundedVec<u8, N>) -> [u8; 64]
 
     let num_used_padded_bytes = num_used_blocks * SHA512_BLOCK_SIZE;
     // N.B. this line turns `padded_msg` into a RAM array, which is expensive!
-    // The cost of this is roughly 7 * N gates.
+    // The cost of this is roughly 7* N gates.
     // There are cheaper ways of doing this (e.g. pack into 8-byte field elements first, then update msg length),
     // however the cost of the RAM array is small relative to the total cost of a hash, so not really worth the extra complexity
     padded_msg[msg_length] = 128;
@@ -186,7 +184,7 @@ fn digest_var<let N: u32, let IS_SHA512: u1>(msg: BoundedVec<u8, N>) -> [u8; 64]
     out_h
 }
 
-// methods here are interface-compatible with stdlib
+/// methods here are interface-compatible with sha256 blackbox fns
 pub mod sha512 {
     pub fn digest<let N: u32>(msg: [u8; N]) -> [u8; 64] {
         crate::digest::<_, 1>(msg)
@@ -273,7 +271,6 @@ pub mod sha512 {
 
 }
 
-// methods here are interface-compatible with stdlib
 pub mod sha384 {
     pub fn digest<let N: u32>(msg: [u8; N]) -> [u8; 48] {
         let full_result = crate::digest::<_, 0>(msg);

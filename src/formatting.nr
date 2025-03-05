@@ -1,6 +1,4 @@
-/**
- * @brief convert 128-byte array to array of 16 u64s
- **/
+/// Convert 128-byte array to array of 16 u64s
 pub(crate) fn msg_u8_to_u64(msg: [u8; 128]) -> [u64; 16] {
     let mut msg64: [u64; 16] = [0; 16];
 
@@ -16,11 +14,11 @@ pub(crate) fn msg_u8_to_u64(msg: [u8; 128]) -> [u64; 16] {
     msg64
 }
 
-/** 
- * @brief convert an input `Field` element into a `u64`
- * @details this fn requires that `input` is < 2^{64} or unsatisfiable constraints will be created
- *          this fn is cheaper than `as u64` because the overflow case is not handled
- **/
+/// Convert an input `Field` element into a `u64`
+///
+/// # Notes
+/// This fn requires that `input` is < 2^{64} or unsatisfiable constraints will be created.
+/// This fn is cheaper than `as u64` because the overflow case is not handled
 pub(crate) fn to_u64(input: Field) -> u64 {
     // Safety: plucking u64 out of an unconstrained fn and then validating its correctness
     // is cheaper than `as u64`, because `as u64` handles overflow cases, which we can simply forbid with a range check
@@ -30,17 +28,14 @@ pub(crate) fn to_u64(input: Field) -> u64 {
     converted
 }
 
-/**
- * @brief given an input `Field` element known to be less than 2^72,
- *        return the component of `input` that is less than 2^64
- **/
+/// Given an input `Field` element known to be less than 2^72, return the component of `input` that is less than 2^64
 pub(crate) fn reduce_modulo_64(input: Field) -> Field {
     // Safety: obtain result and then validate result is correct
     let (modulus, remainder) = unsafe { __reduce_modulo_64(input) };
 
     // 1.25 gates
     modulus.assert_max_bit_size::<8>();
-    // 64 bits = 14 * 4 + 8 = 3.25
+    // 64 bits = 14/// 4 + 8 = 3.25
     remainder.assert_max_bit_size::<64>();
     assert_eq(modulus * 0x10000000000000000 + remainder, input);
 

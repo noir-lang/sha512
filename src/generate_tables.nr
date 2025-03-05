@@ -1,5 +1,12 @@
-unconstrained fn compute_base4_conversion_table<let TABLE_ENTRIES: u32>() -> [u32; TABLE_ENTRIES] {
-    let mut table: [u32; TABLE_ENTRIES] = [0; TABLE_ENTRIES];
+use crate::tables::{
+    BASE4_ENCODE_1BIT_TABLE, BASE4_ENCODE_2BIT_TABLE, BASE4_ENCODE_3BIT_TABLE,
+    BASE4_ENCODE_4BIT_TABLE, BASE4_ENCODE_5BIT_TABLE, BASE4_ENCODE_6BIT_TABLE,
+    BASE4_ENCODE_7BIT_TABLE, BASE4_ENCODE_8BIT_TABLE, BASE4_ENCODE_9BIT_TABLE,
+    BASE4_MAJORITY_DECODE_5BIT_TABLE, BASE4_PARTIAL_CHOOSE_DECODE_5BIT_TABLE,
+    BASE4_XOR_DECODE_5BIT_TABLE,
+};
+unconstrained fn compute_base4_conversion_table<let TABLE_ENTRIES: u32>() -> [Field; TABLE_ENTRIES] {
+    let mut table: [Field; TABLE_ENTRIES] = [0; TABLE_ENTRIES];
 
     for i in 0..TABLE_ENTRIES {
         if (i & 1 == 1) {
@@ -34,11 +41,7 @@ unconstrained fn compute_base4_conversion_table<let TABLE_ENTRIES: u32>() -> [u3
 }
 
 unconstrained fn __compute_xor_decoding_table() {
-    // num bits = 6
-
     let mut result: [Field; 4 * 4 * 4 * 4 * 4] = [0; 4 * 4 * 4 * 4 * 4];
-    // for bit1 in 0..4 {
-    //     let bit1out = ((bit1 & 1) == 1) as u32;
     for bit2 in 0..4 {
         let bit2out = ((bit2 & 1) == 1) as u32;
         for bit3 in 0..4 {
@@ -50,8 +53,6 @@ unconstrained fn __compute_xor_decoding_table() {
                     for bit6 in 0..4 {
                         let bit6out = ((bit6 & 1) == 1) as u32;
 
-                        // let mut index = bit1;
-                        // index *= 7;
                         let mut index = bit2;
                         index *= 4;
                         index += bit3;
@@ -62,8 +63,6 @@ unconstrained fn __compute_xor_decoding_table() {
                         index *= 4;
                         index += bit6;
 
-                        // let mut value = bit1out;
-                        // value *= 2;
                         let mut value = bit2out;
                         value *= 2;
                         value += bit3out;
@@ -81,9 +80,11 @@ unconstrained fn __compute_xor_decoding_table() {
             // }
         }
     }
-    println(
-        f"pub global BASE4_XOR_DECODE_5BIT_TABLE: [Field; 1024] = {result}",
-    );
+    assert_eq(result, BASE4_XOR_DECODE_5BIT_TABLE);
+    // UNCOMMENT IF THIS TABLE NEEDS TO BE REGENERATED
+    // println(
+    //     f"pub global BASE4_XOR_DECODE_5BIT_TABLE: [Field; 1024] = {result}",
+    // );
 }
 
 unconstrained fn __compute_partial_choose_decoding_table() {
@@ -104,8 +105,6 @@ unconstrained fn __compute_partial_choose_decoding_table() {
                     for bit6 in 0..4 {
                         let bit6out = ((bit6 & 3) == 1) as u32;
 
-                        // let mut index = bit1;
-                        // index *= 7;
                         let mut index = bit2;
                         index *= 4;
                         index += bit3;
@@ -116,8 +115,6 @@ unconstrained fn __compute_partial_choose_decoding_table() {
                         index *= 4;
                         index += bit6;
 
-                        // let mut value = bit1out;
-                        // value *= 2;
                         let mut value = bit2out;
                         value *= 2;
                         value += bit3out;
@@ -132,12 +129,13 @@ unconstrained fn __compute_partial_choose_decoding_table() {
                     }
                 }
             }
-            // }
         }
     }
-    println(
-        f"pub global BASE4_PARTIAL_CHOOSE_DECODE_5BIT_TABLE: [Field; 1024] = {result}",
-    );
+    assert_eq(result, BASE4_PARTIAL_CHOOSE_DECODE_5BIT_TABLE);
+    // UNCOMMENT IF THIS TABLE NEEDS TO BE REGENERATED
+    // println(
+    //     f"pub global BASE4_PARTIAL_CHOOSE_DECODE_5BIT_TABLE: [Field; 1024] = {result}",
+    // );
 }
 
 unconstrained fn __compute_majority_decoding_table() {
@@ -158,7 +156,7 @@ unconstrained fn __compute_majority_decoding_table() {
                         let bit6out = ((bit6 & 3) > 1) as u32;
 
                         // let mut index = bit1;
-                        // index *= 7;
+                        // index*= 7;
                         let mut index = bit2;
                         index *= 4;
                         index += bit3;
@@ -170,7 +168,7 @@ unconstrained fn __compute_majority_decoding_table() {
                         index += bit6;
 
                         // let mut value = bit1out;
-                        // value *= 2;
+                        // value*= 2;
                         let mut value = bit2out;
                         value *= 2;
                         value += bit3out;
@@ -188,9 +186,11 @@ unconstrained fn __compute_majority_decoding_table() {
             // }
         }
     }
-    println(
-        f"pub global BASE4_MAJORITY_DECODE_5BIT_TABLE: [Field; 1024] = {result}",
-    );
+    assert_eq(result, BASE4_MAJORITY_DECODE_5BIT_TABLE);
+    // UNCOMMENT IF THIS TABLE NEEDS TO BE REGENERATED
+    // println(
+    //     f"pub global BASE4_MAJORITY_DECODE_5BIT_TABLE: [Field; 1024] = {result}",
+    // );
 }
 
 #[test]
@@ -225,14 +225,24 @@ fn print_encoding_table() {
         let t7 = compute_base4_conversion_table::<256>();
         let t8 = compute_base4_conversion_table::<512>();
 
-        println(f"pub global BASE4_ENCODE_1BIT_TABLE: [Field; 2] = {t0};");
-        println(f"pub global BASE4_ENCODE_2BIT_TABLE: [Field; 4] = {t1};");
-        println(f"pub global BASE4_ENCODE_3BIT_TABLE: [Field; 8] = {t2};");
-        println(f"pub global BASE4_ENCODE_4BIT_TABLE: [Field; 16] = {t3};");
-        println(f"pub global BASE4_ENCODE_5BIT_TABLE: [Field; 32] = {t4};");
-        println(f"pub global BASE4_ENCODE_6BIT_TABLE: [Field; 64] = {t5};");
-        println(f"pub global BASE4_ENCODE_7BIT_TABLE: [Field; 128] = {t6};");
-        println(f"pub global BASE4_ENCODE_8BIT_TABLE: [Field; 256] = {t7};");
-        println(f"pub global BASE4_ENCODE_9BIT_TABLE: [Field; 512] = {t8};");
+        // UNCOMMENT IF THESE TABLES NEED TO BE REGENERATED
+        // println(f"pub global BASE4_ENCODE_1BIT_TABLE: [Field; 2] = {t0};");
+        // println(f"pub global BASE4_ENCODE_2BIT_TABLE: [Field; 4] = {t1};");
+        // println(f"pub global BASE4_ENCODE_3BIT_TABLE: [Field; 8] = {t2};");
+        // println(f"pub global BASE4_ENCODE_4BIT_TABLE: [Field; 16] = {t3};");
+        // println(f"pub global BASE4_ENCODE_5BIT_TABLE: [Field; 32] = {t4};");
+        // println(f"pub global BASE4_ENCODE_6BIT_TABLE: [Field; 64] = {t5};");
+        // println(f"pub global BASE4_ENCODE_7BIT_TABLE: [Field; 128] = {t6};");
+        // println(f"pub global BASE4_ENCODE_8BIT_TABLE: [Field; 256] = {t7};");
+        // println(f"pub global BASE4_ENCODE_9BIT_TABLE: [Field; 512] = {t8};");
+        assert_eq(t0, BASE4_ENCODE_1BIT_TABLE);
+        assert_eq(t1, BASE4_ENCODE_2BIT_TABLE);
+        assert_eq(t2, BASE4_ENCODE_3BIT_TABLE);
+        assert_eq(t3, BASE4_ENCODE_4BIT_TABLE);
+        assert_eq(t4, BASE4_ENCODE_5BIT_TABLE);
+        assert_eq(t5, BASE4_ENCODE_6BIT_TABLE);
+        assert_eq(t6, BASE4_ENCODE_7BIT_TABLE);
+        assert_eq(t7, BASE4_ENCODE_8BIT_TABLE);
+        assert_eq(t8, BASE4_ENCODE_9BIT_TABLE);
     }
 }

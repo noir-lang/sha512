@@ -5,9 +5,7 @@ use crate::encoding::{
 use crate::formatting::reduce_modulo_64;
 use crate::tables::SHA512_ROUND_CONSTANTS;
 
-/**
- * @brief represent the SHA384/512 permutation state as base4-encoded variables
- **/
+/// Represent the SHA384/512 permutation state as base4-encoded variables
 pub(crate) struct RoundState {
     pub(crate) a: EncodedMajority,
     pub(crate) b: EncodedMajority,
@@ -19,9 +17,7 @@ pub(crate) struct RoundState {
     pub(crate) h: EncodedChoose,
 }
 
-/**
- * Perform message extension, expanding 16 words of the message schedule into 80 words
- **/
+/// Perform message extension, expanding 16 words of the message schedule into 80 words
 pub(crate) fn extend_message(witness: [Field; 16]) -> [Field; 80] {
     let mut w: [EncodedWitness; 80] = [EncodedWitness::new(); 80];
 
@@ -62,10 +58,10 @@ pub(crate) fn extend_message(witness: [Field; 16]) -> [Field; 80] {
     result
 }
 
-/**
- * @brief evaluate the SHA384/512 compression function
- * @details each iteration costs 243 gates
- **/
+/// Evaluate the SHA384/512 compression function
+///
+/// # Cost
+/// Each iteration costs 243 gates
 pub(crate) fn compress(state: &mut RoundState, w: [Field; 80]) {
     for i in 0..80 {
         // S0 = (a rightrotate 2) xor (a rightrotate 13) xor (a rightrotate 22)
