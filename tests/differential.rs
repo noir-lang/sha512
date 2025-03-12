@@ -93,7 +93,6 @@ fn test_prop_sha512_256() {
         .unwrap();
 }
 
-#[test]
 
 #[test]
 fn test_prop_sha384_1() {
