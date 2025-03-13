@@ -63,7 +63,7 @@ jobs:
           toolchain: ${{ env.MINIMUM_NOIR_VERSION }}
 
       - name: Install Cargo
-        uses: dtolnay/rust-toolchain@1.82.0
+        uses: dtolnay/rust-toolchain@1.85.0
         with:
           targets: x86_64-unknown-linux-gnu
       
