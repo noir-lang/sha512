@@ -1,464 +1,193 @@
-// ror 28
-
-// top 36 bits shifted down
-// bottom 28 bits wrap
-
-// pivot point is bits 24-30 (low 4, high 2)
-
-// ror 34
-// pivot point is bits 30-36 (low 4 , high 2)
-
-// ror 39
-// pivot point is bits 36-42 (low 3, high 3)
-
-// ror 14
-// pivot point is bits 12-18 (low 2, high 4)
-
-// ror 18
-// clean split, no pivot
-
-// ror 41
-// pivot point is bits 36-42 (low 5, high 1)
-
-// ror 1
-// pivot point is bits 0-6 (low 1, high 5)
-
-// ror 8
-// pivot point is bits 6-12 (low 2, high 4)
-
-// right shift 7
-// pivot point is bits 6-12 (low 1, high 5)
-
-// ror 19
-// pivot point is bits 18-24 (low 1, high 5)
-
-// ror 61
-// pivot point bits 60-61 (low 1, high 5)
-
-// rightshift 6
-// no pivot
-
-// Summary
-// (low 4, high 2)
-// (low 5, high 1)
-// (low 3, high 3)
-// (low 2, high 4)
-// (low 1, high 5)
-
-// ^^ all of the above exist
-// a 6-bit table is 2^12 = 4,096 gates = 8,192 gates to init
-
-// we can also use extended representations
-
-// S1 = e.ror6 ^ e.ror11 ^ e.ror25 = bit value in range 0-3 if added
-// ch = (e&f)^(!e&g) = 0-4?
-
-/*
-| e | f | g | (e&f)^(!e&g) |
-| 0 | 0 | 0 | 0 | 1
-| 0 | 0 | 1 | 1 | 3
-| 0 | 1 | 0 | 0 | 0
-| 0 | 1 | 1 | 1 | 2
-| 1 | 0 | 0 | 0 | 4
-| 1 | 0 | 1 | 0 | 6
-| 1 | 1 | 0 | 1 | 3
-| 1 | 1 | 1 | 1 | 5
-
-3e + 1 - f + 2g = 0 to 6 
-
-// 0 - 6 and 0 - 3 = 0 to 27
-
-// 0-27 is a 2-bit table (size 784)
-// implies 32 lookups to convert out
-
-// 0-3 and 0-3 for S0 + maj
-// 0-15 = 4 bits = 3-bit table
-// implies 22 lookups to convert out
-
-
-// we can do...
-// convert out of triple XOR = 6 bit tables = 11 lookups
-// convert out of ch linear relation = 4 bit tables = 16 lookups
-// convert out of maj = 6 bit table = 11 lookups
-
-// 49 lookups to convert out
-// convert in = 12 bit table = 11 lookups
-// 60 lookups total = 120 gates + lots of fluff
-// total = 27 lookups
-
-
-// What tables do we need?
-
-// 1: Convert into sparse representation
-// Use bit widths of 1 to 8 inclusive and use these to rotate and shift while converting
-
-// Each bit can range from 0 to 6 so we need a base 7 repr
-*/
-
-/*
-majority conversion
-
-maj := (a and b) xor (a and c) xor (b and c)
-
-a b c maj
-0 0 0 0
-0 0 1 0
-0 1 0 0
-0 1 1 1
-1 0 0 0
-1 0 1 1
-1 1 0 1
-1 1 1 1
-
-a + b + c. map 0 to 0, 1 to 0, 2 to 1, 3 to 1
-*/
-
-pub unconstrained fn get_decomposition<let BIT_WIDTH: u32>(input: u32) -> [u32; BIT_WIDTH] {
-    let mut acc = input;
-    let mut r: [u32; BIT_WIDTH] = [0; BIT_WIDTH];
-    for i in 0..BIT_WIDTH {
-        r[i] = acc & 1;
-        acc = acc >> 1;
-    }
-    r
-}
-pub unconstrained fn compute_base4_conversion_table<let TABLE_ENTRIES: u32>() -> [u32; TABLE_ENTRIES] {
-    let mut table: [u32; TABLE_ENTRIES] = [0; TABLE_ENTRIES];
-
-    for i in 0..TABLE_ENTRIES {
-        if (i & 1 == 1) {
-            table[i] += 1;
-        }
-        if ((i >> 1) & 1 == 1) {
-            table[i] += 4;
-        }
-        if ((i >> 2) & 1 == 1) {
-            table[i] += 16;
-        }
-        if ((i >> 3) & 1 == 1) {
-            table[i] += 64;
-        }
-        if ((i >> 4) & 1 == 1) {
-            table[i] += 256;
-        }
-        if ((i >> 5) & 1 == 1) {
-            table[i] += 1024;
-        }
-        if ((i >> 6) & 1 == 1) {
-            table[i] += 4096;
-        }
-        if ((i >> 7) & 1 == 1) {
-            table[i] += 16384;
-        }
-        if ((i >> 8) & 1 == 1) {
-            table[i] += 65536;
-        }
-    }
-    table
-}
-
-#[test]
-fn make_table() {
-    // Safety: no need to constrain this we're just computing+printing lookup table values
-    unsafe {
-        let t0 = compute_base4_conversion_table::<2>();
-        let t1 = compute_base4_conversion_table::<4>();
-        let t2 = compute_base4_conversion_table::<8>();
-        let t3 = compute_base4_conversion_table::<16>();
-        let t4 = compute_base4_conversion_table::<32>();
-        let t5 = compute_base4_conversion_table::<64>();
-        let t6 = compute_base4_conversion_table::<128>();
-        let t7 = compute_base4_conversion_table::<256>();
-        let t8 = compute_base4_conversion_table::<512>();
-
-        println(f"pub global BASE4_ENCODE_1BIT_TABLE: [Field; 2] = {t0};");
-        println(f"pub global BASE4_ENCODE_2BIT_TABLE: [Field; 4] = {t1};");
-        println(f"pub global BASE4_ENCODE_3BIT_TABLE: [Field; 8] = {t2};");
-        println(f"pub global BASE4_ENCODE_4BIT_TABLE: [Field; 16] = {t3};");
-        println(f"pub global BASE4_ENCODE_5BIT_TABLE: [Field; 32] = {t4};");
-        println(f"pub global BASE4_ENCODE_6BIT_TABLE: [Field; 64] = {t5};");
-        println(f"pub global BASE4_ENCODE_7BIT_TABLE: [Field; 128] = {t6};");
-        println(f"pub global BASE4_ENCODE_8BIT_TABLE: [Field; 256] = {t7};");
-        println(f"pub global BASE4_ENCODE_9BIT_TABLE: [Field; 512] = {t8};");
-    }
-}
-
-unconstrained fn compute_xor_decoding_table() {
-    // num bits = 6
-
-    let mut result: [Field; 4 * 4 * 4 * 4 * 4] = [0; 4 * 4 * 4 * 4 * 4];
-    // for bit1 in 0..4 {
-    //     let bit1out = ((bit1 & 1) == 1) as u32;
-    for bit2 in 0..4 {
-        let bit2out = ((bit2 & 1) == 1) as u32;
-        for bit3 in 0..4 {
-            let bit3out = ((bit3 & 1) == 1) as u32;
-            for bit4 in 0..4 {
-                let bit4out = ((bit4 & 1) == 1) as u32;
-                for bit5 in 0..4 {
-                    let bit5out = ((bit5 & 1) == 1) as u32;
-                    for bit6 in 0..4 {
-                        let bit6out = ((bit6 & 1) == 1) as u32;
-
-                        // let mut index = bit1;
-                        // index *= 7;
-                        let mut index = bit2;
-                        index *= 4;
-                        index += bit3;
-                        index *= 4;
-                        index += bit4;
-                        index *= 4;
-                        index += bit5;
-                        index *= 4;
-                        index += bit6;
-
-                        // let mut value = bit1out;
-                        // value *= 2;
-                        let mut value = bit2out;
-                        value *= 2;
-                        value += bit3out;
-                        value *= 2;
-                        value += bit4out;
-                        value *= 2;
-                        value += bit5out;
-                        value *= 2;
-                        value += bit6out;
-
-                        result[index] = value as Field;
-                    }
-                }
-            }
-            // }
-        }
-    }
-    println(
-        f"pub global BASE4_XOR_DECODE_5BIT_TABLE: [Field; 1024] = {result}",
-    );
-}
-
-// choose decoding tables...
-
-// (e and f) xor ((not e) and g)
-// step 1: do !e & g
-
-// e g !e&g  (1 - e + g)
-// 0 0 0      1
-// 0 1 1      2
-// 1 0 0      0
-// 1 1 0      1
-
-// (1 - e) + g . map 2 to 1, 1 to 0, 0 to 0 (but stay in base4)
-
-// e f (!e & g) f+ (1-e) + (!e & g)
-// 0 0 0 0          1
-// 0 0 1 1          2
-// 0 1 0 0          0
-// 0 1 1 1          1
-// 1 0 0 0
-// 1 0 1 -
-// 1 1 0 1
-// 1 1 1 -
-
-// (!e & g) + e + f X
-
-// e g (e&f)  result -(e & f) + g - e
-// 0 0 0    0           0
-// 0 0 1    -           -
-// 0 1 0    1           1
-// 0 1 1    -           -
-// 1 0 0    0           -1
-// 1 0 1    1           -2
-// 1 1 0    0           0
-// 1 1 1    1           1
-
-// (e & f) | g   2g + f
-// 0 0 0 0   0
-// 0 0 1 1   2
-// 0 1 0 0   1
-// 0 1 1 1   3
-// 1 0 0 0
-// 1 0 1 1
-// 1 1 0 1
-// 1 1 1 1
-
-// | e | f | g | r |(e & f) - f + g|
-// | 0 | 0 | 0 | 0 | 0 |
-// | 0 | 0 | 1 | 1 | 1 |
-// | 0 | 1 | 0 | 0 | -1 |
-// | 0 | 1 | 1 | 1 | 0 |
-// | 1 | 0 | 0 | 0 | 0 |
-// | 1 | 0 | 1 | 0 | -1 |
-// | 1 | 1 | 0 | 1 | 0 |
-// | 1 | 1 | 1 | 1 | -1 |
-
-// -(e&f) + g - e
-// map 0 to 1
-// map 1 to 0
-// map 2 to 0
-// map 3 to 1
-
-// fuck no broken argh
-// 3e + 1 - f + 2g
-// 2g + 1 - f = 0 to 3
-// e f g result  3e + 1 - f + 2g  1 - f + 2g   r             +g    +f   need             (1 - f) + e + g  <- + (1 - f) + g
-// 0 0 0 0  0   1   1           1           0           0     0    0     0         1
-// 0 0 1 1  1   3   3           2           1           1     2    2     1         1
-// 0 1 0 0  1   0   0           0           0           0     0    1     0        0
-// 0 1 1 1  2   2   2           1           1           0     1    2     1        1
-// 1 0 0 0  1   4   1           2           0           1     1    1     0        1
-// 1 0 1 0  2   6   3           3           0           1     2    2     0        0
-// 1 1 0 1  2   3   0           1           1           0     0    1     1        1
-// 1 1 1 1  3   5   2           2           1           1     2    3     1        1
-
-// 1 and 2 -> 1
-// 0 and 3 -> 0
-
-// e f g ()
-// I need a lookup that condenses into a single bit: 0 or 1
-// if e = 0. 3 maps to 1, 2 maps to 1, 0 maps to 0, 1 maps to 0
-// if e = 1. 3 maps to 0, 2 maps to 1, 0 maps to 1, 1 maps to 0
-
-// in both cases. 2 maps to 1, 1 maps to 0
-
-// [result if e=0 , result if e=1]?
-
-// [0,1,2,3] -> [number]
-
-// 0 -> 0
-// 1 -> 0
-// 2 -> 1
-// 3 -> 1
-
-// 0 -> 1
-// 1 -> 0
-// 2 -> 1
-// 3 -> 0
-
-unconstrained fn compute_partial_choose_decoding_table() {
-    // num bits = 6
-    // !e & g
-    // 2e + g -> 1 maps to 0
-    let mut result: [Field; 4 * 4 * 4 * 4 * 4] = [0; 4 * 4 * 4 * 4 * 4];
-    // for bit1 in 0..4 {
-    //     let bit1out = ((bit1 & 1) == 1) as u32;
-    for bit2 in 0..4 {
-        let bit2out = ((bit2 & 3) == 1) as u32;
-        for bit3 in 0..4 {
-            let bit3out = ((bit3 & 3) == 1) as u32;
-            for bit4 in 0..4 {
-                let bit4out = ((bit4 & 3) == 1) as u32;
-                for bit5 in 0..4 {
-                    let bit5out = ((bit5 & 3) == 1) as u32;
-                    for bit6 in 0..4 {
-                        let bit6out = ((bit6 & 3) == 1) as u32;
-
-                        // let mut index = bit1;
-                        // index *= 7;
-                        let mut index = bit2;
-                        index *= 4;
-                        index += bit3;
-                        index *= 4;
-                        index += bit4;
-                        index *= 4;
-                        index += bit5;
-                        index *= 4;
-                        index += bit6;
-
-                        // let mut value = bit1out;
-                        // value *= 2;
-                        let mut value = bit2out;
-                        value *= 2;
-                        value += bit3out;
-                        value *= 2;
-                        value += bit4out;
-                        value *= 2;
-                        value += bit5out;
-                        value *= 2;
-                        value += bit6out;
-
-                        result[index] = value as Field;
-                    }
-                }
-            }
-            // }
-        }
-    }
-    println(
-        f"pub global BASE4_PARTIAL_CHOOSE_DECODE_5BIT_TABLE: [Field; 1024] = {result}",
-    );
-}
-
-unconstrained fn compute_majority_decoding_table() {
-    // num bits = 6
-
-    let mut result: [Field; 4 * 4 * 4 * 4 * 4] = [0; 4 * 4 * 4 * 4 * 4];
-    // for bit1 in 0..4 {
-    //     let bit1out = ((bit1 & 1) == 1) as u32;
-    for bit2 in 0..4 {
-        let bit2out = ((bit2 & 3) > 1) as u32;
-        for bit3 in 0..4 {
-            let bit3out = ((bit3 & 3) > 1) as u32;
-            for bit4 in 0..4 {
-                let bit4out = ((bit4 & 3) > 1) as u32;
-                for bit5 in 0..4 {
-                    let bit5out = ((bit5 & 3) > 1) as u32;
-                    for bit6 in 0..4 {
-                        let bit6out = ((bit6 & 3) > 1) as u32;
-
-                        // let mut index = bit1;
-                        // index *= 7;
-                        let mut index = bit2;
-                        index *= 4;
-                        index += bit3;
-                        index *= 4;
-                        index += bit4;
-                        index *= 4;
-                        index += bit5;
-                        index *= 4;
-                        index += bit6;
-
-                        // let mut value = bit1out;
-                        // value *= 2;
-                        let mut value = bit2out;
-                        value *= 2;
-                        value += bit3out;
-                        value *= 2;
-                        value += bit4out;
-                        value *= 2;
-                        value += bit5out;
-                        value *= 2;
-                        value += bit6out;
-
-                        result[index] = value as Field;
-                    }
-                }
-            }
-            // }
-        }
-    }
-    println(
-        f"pub global BASE4_MAJORITY_DECODE_5BIT_TABLE: [Field; 1024] = {result}",
-    );
-}
-
-#[test]
-fn print_xor_decoding_table() {
-    //Safety:
-    unsafe { compute_xor_decoding_table() };
-}
-
-#[test]
-fn print_partial_choose_decoding_table() {
-    //Safety:
-    unsafe { compute_partial_choose_decoding_table() };
-}
-
-#[test]
-fn print_majority_decoding_table() {
-    //Safety:
-    unsafe { compute_majority_decoding_table() };
-}
-
+pub(crate) global SHA384_INITIAL_HASH_VALUES: [u64; 8] = [
+    0xcbbb9d5dc1059ed8,
+    0x629a292a367cd507,
+    0x9159015a3070dd17,
+    0x152fecd8f70e5939,
+    0x67332667ffc00b31,
+    0x8eb44a8768581511,
+    0xdb0c2e0d64f98fa7,
+    0x47b5481dbefa4fa4,
+];
+pub(crate) global SHA512_INITIAL_HASH_VALUES: [u64; 8] = [
+    0x6a09e667f3bcc908,
+    0xbb67ae8584caa73b,
+    0x3c6ef372fe94f82b,
+    0xa54ff53a5f1d36f1,
+    0x510e527fade682d1,
+    0x9b05688c2b3e6c1f,
+    0x1f83d9abfb41bd6b,
+    0x5be0cd19137e2179,
+];
+
+pub(crate) global SHA512_ROUND_CONSTANTS: [u64; 80] = [
+    0x428a2f98d728ae22,
+    0x7137449123ef65cd,
+    0xb5c0fbcfec4d3b2f,
+    0xe9b5dba58189dbbc,
+    0x3956c25bf348b538,
+    0x59f111f1b605d019,
+    0x923f82a4af194f9b,
+    0xab1c5ed5da6d8118,
+    0xd807aa98a3030242,
+    0x12835b0145706fbe,
+    0x243185be4ee4b28c,
+    0x550c7dc3d5ffb4e2,
+    0x72be5d74f27b896f,
+    0x80deb1fe3b1696b1,
+    0x9bdc06a725c71235,
+    0xc19bf174cf692694,
+    0xe49b69c19ef14ad2,
+    0xefbe4786384f25e3,
+    0x0fc19dc68b8cd5b5,
+    0x240ca1cc77ac9c65,
+    0x2de92c6f592b0275,
+    0x4a7484aa6ea6e483,
+    0x5cb0a9dcbd41fbd4,
+    0x76f988da831153b5,
+    0x983e5152ee66dfab,
+    0xa831c66d2db43210,
+    0xb00327c898fb213f,
+    0xbf597fc7beef0ee4,
+    0xc6e00bf33da88fc2,
+    0xd5a79147930aa725,
+    0x06ca6351e003826f,
+    0x142929670a0e6e70,
+    0x27b70a8546d22ffc,
+    0x2e1b21385c26c926,
+    0x4d2c6dfc5ac42aed,
+    0x53380d139d95b3df,
+    0x650a73548baf63de,
+    0x766a0abb3c77b2a8,
+    0x81c2c92e47edaee6,
+    0x92722c851482353b,
+    0xa2bfe8a14cf10364,
+    0xa81a664bbc423001,
+    0xc24b8b70d0f89791,
+    0xc76c51a30654be30,
+    0xd192e819d6ef5218,
+    0xd69906245565a910,
+    0xf40e35855771202a,
+    0x106aa07032bbd1b8,
+    0x19a4c116b8d2d0c8,
+    0x1e376c085141ab53,
+    0x2748774cdf8eeb99,
+    0x34b0bcb5e19b48a8,
+    0x391c0cb3c5c95a63,
+    0x4ed8aa4ae3418acb,
+    0x5b9cca4f7763e373,
+    0x682e6ff3d6b2b8a3,
+    0x748f82ee5defb2fc,
+    0x78a5636f43172f60,
+    0x84c87814a1f0ab72,
+    0x8cc702081a6439ec,
+    0x90befffa23631e28,
+    0xa4506cebde82bde9,
+    0xbef9a3f7b2c67915,
+    0xc67178f2e372532b,
+    0xca273eceea26619c,
+    0xd186b8c721c0c207,
+    0xeada7dd6cde0eb1e,
+    0xf57d4f7fee6ed178,
+    0x06f067aa72176fba,
+    0x0a637dc5a2c898a6,
+    0x113f9804bef90dae,
+    0x1b710b35131c471b,
+    0x28db77f523047d84,
+    0x32caab7b40c72493,
+    0x3c9ebe0a15c9bebc,
+    0x431d67c49c100d4c,
+    0x4cc5d4becb3e42b6,
+    0x597f299cfc657e2a,
+    0x5fcb6fab3ad6faec,
+    0x6c44198c4a475817,
+];
+
+pub global BASE4_POWERS: [Field; 64] = [
+    1,
+    0x4,
+    0x10,
+    0x40,
+    0x100,
+    0x400,
+    0x1000,
+    0x4000,
+    0x10000,
+    0x40000,
+    0x100000,
+    0x400000,
+    0x1000000,
+    0x4000000,
+    0x10000000,
+    0x40000000,
+    0x100000000,
+    0x400000000,
+    0x1000000000,
+    0x4000000000,
+    0x10000000000,
+    0x40000000000,
+    0x100000000000,
+    0x400000000000,
+    0x1000000000000,
+    0x4000000000000,
+    0x10000000000000,
+    0x40000000000000,
+    0x100000000000000,
+    0x400000000000000,
+    0x1000000000000000,
+    0x4000000000000000,
+    0x10000000000000000,
+    0x40000000000000000,
+    0x100000000000000000,
+    0x400000000000000000,
+    0x1000000000000000000,
+    0x4000000000000000000,
+    0x10000000000000000000,
+    0x40000000000000000000,
+    0x100000000000000000000,
+    0x400000000000000000000,
+    0x1000000000000000000000,
+    0x4000000000000000000000,
+    0x10000000000000000000000,
+    0x40000000000000000000000,
+    0x100000000000000000000000,
+    0x400000000000000000000000,
+    0x1000000000000000000000000,
+    0x4000000000000000000000000,
+    0x10000000000000000000000000,
+    0x40000000000000000000000000,
+    0x100000000000000000000000000,
+    0x400000000000000000000000000,
+    0x1000000000000000000000000000,
+    0x4000000000000000000000000000,
+    0x10000000000000000000000000000,
+    0x40000000000000000000000000000,
+    0x100000000000000000000000000000,
+    0x400000000000000000000000000000,
+    0x1000000000000000000000000000000,
+    0x4000000000000000000000000000000,
+    0x10000000000000000000000000000000,
+    0x40000000000000000000000000000000,
+];
+
+///
+/// BASE4_PARTIAL_CHOOSE_DECODE_5BIT_TABLE is a map that takes an input represented as:
+///      input = \sum_{i=0}^{i<5} 4^i b_i
+/// and produces an output represented as:
+///      output = \sum_{i=0}^{i<5} 2^i r_i
+///
+/// where the map between b_i and r_i is the following:
+///
+/// | b_i | r_i |
+/// | --- | --- |
+/// |   0 |   0 |
+/// |   1 |   1 |
+/// |   2 |   0 |
+/// |   3 |   0 |
+///
+/// Purpose of the table is to evaluate the relation (!e ^ g).
+/// Both `e` and `g` are encoded in the base4 basis and the linear relation `2e + g` is used as input to this table.
+/// The table crates an isomorphic map between `2e + g` in the base4 basis and `!e ^ g` in the base2 basis
+///
 pub global BASE4_PARTIAL_CHOOSE_DECODE_5BIT_TABLE: [Field; 1024] = [
     0x00, 0x01, 0x00, 0x00, 0x02, 0x03, 0x02, 0x02, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
     0x04, 0x05, 0x04, 0x04, 0x06, 0x07, 0x06, 0x06, 0x04, 0x05, 0x04, 0x04, 0x04, 0x05, 0x04, 0x04,
@@ -526,6 +255,25 @@ pub global BASE4_PARTIAL_CHOOSE_DECODE_5BIT_TABLE: [Field; 1024] = [
     0x00, 0x01, 0x00, 0x00, 0x02, 0x03, 0x02, 0x02, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
 ];
 
+///
+/// BASE4_MAJORITY_DECODE_5BIT_TABLE is a map that takes an input represented as:
+///      input = \sum_{i=0}^{i<5} 4^i b_i
+/// and produces an output represented as:
+///      output = \sum_{i=0}^{i<5} 2^i r_i
+///
+/// where the map between b_i and r_i is the following:
+///
+/// | b_i | r_i |
+/// | --- | --- |
+/// |   0 |   0 |
+/// |   1 |   0 |
+/// |   2 |   1 |
+/// |   3 |   1 |
+///
+/// Purpose of the table is to evaluate the relation (a & b) ^ (a & c) ^ (b & c)
+/// All of `a, b, c` are encoded in the base4 basis and the linear relation `a + b + c` is used as input to this table.
+/// The table crates an isomorphic map between `a + b + c` in the base4 basis and `(a & b) ^ (a & c) ^ (b & c)` in the base2 basis
+///
 pub global BASE4_MAJORITY_DECODE_5BIT_TABLE: [Field; 1024] = [
     0x00, 0x00, 0x01, 0x01, 0x00, 0x00, 0x01, 0x01, 0x02, 0x02, 0x03, 0x03, 0x02, 0x02, 0x03, 0x03,
     0x00, 0x00, 0x01, 0x01, 0x00, 0x00, 0x01, 0x01, 0x02, 0x02, 0x03, 0x03, 0x02, 0x02, 0x03, 0x03,
@@ -593,6 +341,25 @@ pub global BASE4_MAJORITY_DECODE_5BIT_TABLE: [Field; 1024] = [
     0x1c, 0x1c, 0x1d, 0x1d, 0x1c, 0x1c, 0x1d, 0x1d, 0x1e, 0x1e, 0x1f, 0x1f, 0x1e, 0x1e, 0x1f, 0x1f,
 ];
 
+///
+/// BASE4_XOR_DECODE_5BIT_TABLE is a map that takes an input represented as:
+///      input = \sum_{i=0}^{i<5} 4^i b_i
+/// and produces an output represented as:
+///      output = \sum_{i=0}^{i<5} 2^i r_i
+///
+/// where the map between b_i and r_i is the following:
+///
+/// | b_i | r_i |
+/// | --- | --- |
+/// |   0 |   0 |
+/// |   1 |   1 |
+/// |   2 |   0 |
+/// |   3 |   1 |
+///
+/// Purpose of the table is to evaluate the relation a ^ b ^ c
+/// All of `a, b, c` are encoded in the base4 basis and the linear relation `a + b + c` is used as input to this table.
+/// The table crates an isomorphic map between `a + b + c` in the base4 basis and `a ^ b ^ c` in the base2 basis
+///
 pub global BASE4_XOR_DECODE_5BIT_TABLE: [Field; 1024] = [
     0x00, 0x01, 0x00, 0x01, 0x02, 0x03, 0x02, 0x03, 0x00, 0x01, 0x00, 0x01, 0x02, 0x03, 0x02, 0x03,
     0x04, 0x05, 0x04, 0x05, 0x06, 0x07, 0x06, 0x07, 0x04, 0x05, 0x04, 0x05, 0x06, 0x07, 0x06, 0x07,
@@ -659,6 +426,7 @@ pub global BASE4_XOR_DECODE_5BIT_TABLE: [Field; 1024] = [
     0x18, 0x19, 0x18, 0x19, 0x1a, 0x1b, 0x1a, 0x1b, 0x18, 0x19, 0x18, 0x19, 0x1a, 0x1b, 0x1a, 0x1b,
     0x1c, 0x1d, 0x1c, 0x1d, 0x1e, 0x1f, 0x1e, 0x1f, 0x1c, 0x1d, 0x1c, 0x1d, 0x1e, 0x1f, 0x1e, 0x1f,
 ];
+
 pub global BASE4_ENCODE_1BIT_TABLE: [Field; 2] = [0, 1];
 pub global BASE4_ENCODE_2BIT_TABLE: [Field; 4] = [0, 1, 4, 5];
 pub global BASE4_ENCODE_3BIT_TABLE: [Field; 8] = [0, 1, 4, 5, 16, 17, 20, 21];
@@ -742,71 +510,4 @@ pub global BASE4_ENCODE_9BIT_TABLE: [Field; 512] = [
     86337, 86340, 86341, 86352, 86353, 86356, 86357, 87040, 87041, 87044, 87045, 87056, 87057,
     87060, 87061, 87104, 87105, 87108, 87109, 87120, 87121, 87124, 87125, 87296, 87297, 87300,
     87301, 87312, 87313, 87316, 87317, 87360, 87361, 87364, 87365, 87376, 87377, 87380, 87381,
-];
-
-pub global BASE4_POWERS: [Field; 64] = [
-    1,
-    0x4,
-    0x10,
-    0x40,
-    0x100,
-    0x400,
-    0x1000,
-    0x4000,
-    0x10000,
-    0x40000,
-    0x100000,
-    0x400000,
-    0x1000000,
-    0x4000000,
-    0x10000000,
-    0x40000000,
-    0x100000000,
-    0x400000000,
-    0x1000000000,
-    0x4000000000,
-    0x10000000000,
-    0x40000000000,
-    0x100000000000,
-    0x400000000000,
-    0x1000000000000,
-    0x4000000000000,
-    0x10000000000000,
-    0x40000000000000,
-    0x100000000000000,
-    0x400000000000000,
-    0x1000000000000000,
-    0x4000000000000000,
-    0x10000000000000000,
-    0x40000000000000000,
-    0x100000000000000000,
-    0x400000000000000000,
-    0x1000000000000000000,
-    0x4000000000000000000,
-    0x10000000000000000000,
-    0x40000000000000000000,
-    0x100000000000000000000,
-    0x400000000000000000000,
-    0x1000000000000000000000,
-    0x4000000000000000000000,
-    0x10000000000000000000000,
-    0x40000000000000000000000,
-    0x100000000000000000000000,
-    0x400000000000000000000000,
-    0x1000000000000000000000000,
-    0x4000000000000000000000000,
-    0x10000000000000000000000000,
-    0x40000000000000000000000000,
-    0x100000000000000000000000000,
-    0x400000000000000000000000000,
-    0x1000000000000000000000000000,
-    0x4000000000000000000000000000,
-    0x10000000000000000000000000000,
-    0x40000000000000000000000000000,
-    0x100000000000000000000000000000,
-    0x400000000000000000000000000000,
-    0x1000000000000000000000000000000,
-    0x4000000000000000000000000000000,
-    0x10000000000000000000000000000000,
-    0x40000000000000000000000000000000,
 ];
