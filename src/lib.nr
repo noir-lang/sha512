@@ -193,6 +193,24 @@ pub mod sha512 {
     pub fn sha512_var<let N: u32>(msg: BoundedVec<u8, N>) -> [u8; 64] {
         crate::digest_var::<_, 1>(msg)
     }
+
+    // Fuzz testing the sha512 implementation
+
+    #[export]
+    fn test_sha512_1(input: BoundedVec<u8, 1>) -> [u8; 64] {
+        sha512_var(input)
+    }
+
+    #[export]
+    fn test_sha512_100(input: BoundedVec<u8, 100>) -> [u8; 64] {
+        sha512_var(input)
+    }
+
+    #[export]
+    fn test_sha512_256(input: BoundedVec<u8, 256>) -> [u8; 64] {
+        sha512_var(input)
+    }
+
     #[test]
     fn test_empty_string() {
         let input: [u8; 0] = [];
@@ -288,6 +306,23 @@ pub mod sha384 {
             r[i] = full_result[i];
         }
         r
+    }
+
+    // Fuzz testing the sha384 implementation
+
+    #[export]
+    fn test_sha384_1(input: BoundedVec<u8, 1>) -> [u8; 48] {
+        sha384_var(input)
+    }
+
+    #[export]
+    fn test_sha384_100(input: BoundedVec<u8, 100>) -> [u8; 48] {
+        sha384_var(input)
+    }
+
+    #[export]
+    fn test_sha384_256(input: BoundedVec<u8, 256>) -> [u8; 48] {
+        sha384_var(input)
     }
 
     #[test]
