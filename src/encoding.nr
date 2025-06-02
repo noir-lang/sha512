@@ -298,18 +298,18 @@ pub(crate) fn encode_message_extension(w: Field) -> EncodedWitness {
     let mut base4_encoded_slices: [Field; 12] = [0; 12];
     //   1, 5, 1, 1, 8, 3, 8, 8, 8, 9, 9, 3
 
-    base4_encoded_slices[0] = BASE4_ENCODE_1BIT_TABLE[s[0]];
-    base4_encoded_slices[1] = BASE4_ENCODE_5BIT_TABLE[s[1]];
-    base4_encoded_slices[2] = BASE4_ENCODE_1BIT_TABLE[s[2]];
-    base4_encoded_slices[3] = BASE4_ENCODE_1BIT_TABLE[s[3]];
-    base4_encoded_slices[4] = BASE4_ENCODE_8BIT_TABLE[s[4]];
-    base4_encoded_slices[5] = BASE4_ENCODE_3BIT_TABLE[s[5]];
-    base4_encoded_slices[6] = BASE4_ENCODE_8BIT_TABLE[s[6]];
-    base4_encoded_slices[7] = BASE4_ENCODE_8BIT_TABLE[s[7]];
-    base4_encoded_slices[8] = BASE4_ENCODE_8BIT_TABLE[s[8]];
-    base4_encoded_slices[9] = BASE4_ENCODE_9BIT_TABLE[s[9]];
-    base4_encoded_slices[10] = BASE4_ENCODE_9BIT_TABLE[s[10]];
-    base4_encoded_slices[11] = BASE4_ENCODE_3BIT_TABLE[s[11]];
+    base4_encoded_slices[0] = BASE4_ENCODE_1BIT_TABLE[s[0] as u32];
+    base4_encoded_slices[1] = BASE4_ENCODE_5BIT_TABLE[s[1] as u32];
+    base4_encoded_slices[2] = BASE4_ENCODE_1BIT_TABLE[s[2] as u32];
+    base4_encoded_slices[3] = BASE4_ENCODE_1BIT_TABLE[s[3] as u32];
+    base4_encoded_slices[4] = BASE4_ENCODE_8BIT_TABLE[s[4] as u32];
+    base4_encoded_slices[5] = BASE4_ENCODE_3BIT_TABLE[s[5] as u32];
+    base4_encoded_slices[6] = BASE4_ENCODE_8BIT_TABLE[s[6] as u32];
+    base4_encoded_slices[7] = BASE4_ENCODE_8BIT_TABLE[s[7] as u32];
+    base4_encoded_slices[8] = BASE4_ENCODE_8BIT_TABLE[s[8] as u32];
+    base4_encoded_slices[9] = BASE4_ENCODE_9BIT_TABLE[s[9] as u32];
+    base4_encoded_slices[10] = BASE4_ENCODE_9BIT_TABLE[s[10] as u32];
+    base4_encoded_slices[11] = BASE4_ENCODE_3BIT_TABLE[s[11] as u32];
 
     // 42
     let mut bits19to61 = base4_encoded_slices[10];
@@ -396,15 +396,15 @@ pub(crate) fn encode_e(e: Field) -> EncodedChoose {
 
     let mut base4_encoded_slices: [Field; 9] = [0; 9];
     // 18 gates?
-    base4_encoded_slices[0] = BASE4_ENCODE_8BIT_TABLE[s[0]];
-    base4_encoded_slices[1] = BASE4_ENCODE_6BIT_TABLE[s[1]];
-    base4_encoded_slices[2] = BASE4_ENCODE_4BIT_TABLE[s[2]];
-    base4_encoded_slices[3] = BASE4_ENCODE_6BIT_TABLE[s[3]];
-    base4_encoded_slices[4] = BASE4_ENCODE_8BIT_TABLE[s[4]];
-    base4_encoded_slices[5] = BASE4_ENCODE_9BIT_TABLE[s[5]];
-    base4_encoded_slices[6] = BASE4_ENCODE_7BIT_TABLE[s[6]];
-    base4_encoded_slices[7] = BASE4_ENCODE_8BIT_TABLE[s[7]];
-    base4_encoded_slices[8] = BASE4_ENCODE_8BIT_TABLE[s[8]];
+    base4_encoded_slices[0] = BASE4_ENCODE_8BIT_TABLE[s[0] as u32];
+    base4_encoded_slices[1] = BASE4_ENCODE_6BIT_TABLE[s[1] as u32];
+    base4_encoded_slices[2] = BASE4_ENCODE_4BIT_TABLE[s[2] as u32];
+    base4_encoded_slices[3] = BASE4_ENCODE_6BIT_TABLE[s[3] as u32];
+    base4_encoded_slices[4] = BASE4_ENCODE_8BIT_TABLE[s[4] as u32];
+    base4_encoded_slices[5] = BASE4_ENCODE_9BIT_TABLE[s[5] as u32];
+    base4_encoded_slices[6] = BASE4_ENCODE_7BIT_TABLE[s[6] as u32];
+    base4_encoded_slices[7] = BASE4_ENCODE_8BIT_TABLE[s[7] as u32];
+    base4_encoded_slices[8] = BASE4_ENCODE_8BIT_TABLE[s[8] as u32];
 
     // 14, 18, 41
 
@@ -480,15 +480,15 @@ pub(crate) fn encode_a(a: Field) -> EncodedMajority {
     let mut base4_encoded_slices: [Field; 9] = [0; 9];
     // 18 gates?
 
-    base4_encoded_slices[0] = BASE4_ENCODE_8BIT_TABLE[s[0]];
-    base4_encoded_slices[1] = BASE4_ENCODE_8BIT_TABLE[s[1]];
-    base4_encoded_slices[2] = BASE4_ENCODE_8BIT_TABLE[s[2]];
-    base4_encoded_slices[3] = BASE4_ENCODE_4BIT_TABLE[s[3]];
-    base4_encoded_slices[4] = BASE4_ENCODE_6BIT_TABLE[s[4]];
-    base4_encoded_slices[5] = BASE4_ENCODE_5BIT_TABLE[s[5]];
-    base4_encoded_slices[6] = BASE4_ENCODE_9BIT_TABLE[s[6]];
-    base4_encoded_slices[7] = BASE4_ENCODE_8BIT_TABLE[s[7]];
-    base4_encoded_slices[8] = BASE4_ENCODE_8BIT_TABLE[s[8]];
+    base4_encoded_slices[0] = BASE4_ENCODE_8BIT_TABLE[s[0] as u32];
+    base4_encoded_slices[1] = BASE4_ENCODE_8BIT_TABLE[s[1] as u32];
+    base4_encoded_slices[2] = BASE4_ENCODE_8BIT_TABLE[s[2] as u32];
+    base4_encoded_slices[3] = BASE4_ENCODE_4BIT_TABLE[s[3] as u32];
+    base4_encoded_slices[4] = BASE4_ENCODE_6BIT_TABLE[s[4] as u32];
+    base4_encoded_slices[5] = BASE4_ENCODE_5BIT_TABLE[s[5] as u32];
+    base4_encoded_slices[6] = BASE4_ENCODE_9BIT_TABLE[s[6] as u32];
+    base4_encoded_slices[7] = BASE4_ENCODE_8BIT_TABLE[s[7] as u32];
+    base4_encoded_slices[8] = BASE4_ENCODE_8BIT_TABLE[s[8] as u32];
 
     // 2 gates?
     let mut low28 = base4_encoded_slices[3] * BASE4_POWERS[8];
@@ -550,7 +550,7 @@ pub(crate) fn decode_majority(a: Field, b: Field, c: Field) -> Field {
         reconstructed *= 1024;
         reconstructed += slices[12 - i];
         decoded *= 32;
-        decoded += BASE4_MAJORITY_DECODE_5BIT_TABLE[slices[12 - i]];
+        decoded += BASE4_MAJORITY_DECODE_5BIT_TABLE[slices[12 - i] as u32];
     }
     assert_eq(reconstructed, encoded);
 
@@ -570,7 +570,7 @@ pub(crate) fn decode_choose(e: Field, f: Field, g: Field) -> Field {
         reconstructed *= 1024;
         reconstructed += lhs_slices[12 - i];
         decoded_lhs *= 32;
-        decoded_lhs += BASE4_PARTIAL_CHOOSE_DECODE_5BIT_TABLE[lhs_slices[12 - i]];
+        decoded_lhs += BASE4_PARTIAL_CHOOSE_DECODE_5BIT_TABLE[lhs_slices[12 - i] as u32];
     }
     assert_eq(reconstructed, two_e_plus_g);
 
@@ -584,7 +584,7 @@ pub(crate) fn decode_choose(e: Field, f: Field, g: Field) -> Field {
         reconstructed *= 1024;
         reconstructed += rhs_slices[12 - i];
         decoded_rhs *= 32;
-        decoded_rhs += BASE4_MAJORITY_DECODE_5BIT_TABLE[rhs_slices[12 - i]];
+        decoded_rhs += BASE4_MAJORITY_DECODE_5BIT_TABLE[rhs_slices[12 - i] as u32];
     }
     assert_eq(reconstructed, e_plus_f);
 
@@ -606,7 +606,7 @@ pub(crate) fn decode_xor(encoded: Field) -> Field {
         reconstructed *= 1024;
         reconstructed += slices[12 - i];
         decoded *= 32;
-        decoded += BASE4_XOR_DECODE_5BIT_TABLE[slices[12 - i]];
+        decoded += BASE4_XOR_DECODE_5BIT_TABLE[slices[12 - i] as u32];
     }
     assert_eq(reconstructed, encoded);
 
