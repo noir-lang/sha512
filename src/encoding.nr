@@ -5,8 +5,8 @@ use crate::tables::{
     BASE4_PARTIAL_CHOOSE_DECODE_5BIT_TABLE, BASE4_POWERS, BASE4_XOR_DECODE_5BIT_TABLE,
 };
 
-unconstrained fn decompose_e(e: Field) -> [Field; 9] {
-    let mut r: [Field; 9] = [0; 9];
+unconstrained fn decompose_e(e: Field) -> [u32; 9] {
+    let mut r: [u32; 9] = [0; 9];
     let mut bytes = e.to_le_bytes::<8>();
     let b8to14 = bytes[1] & 63;
     let b14to16 = bytes[1] >> 6;
@@ -15,35 +15,35 @@ unconstrained fn decompose_e(e: Field) -> [Field; 9] {
     let b40to41 = bytes[5] & 1;
     let b41to48 = bytes[5] >> 1;
 
-    r[0] = bytes[0] as Field; // 0-8
-    r[1] = b8to14 as Field; // 8-14
-    r[2] = (b14to16 + (b16to18 << 2)) as Field; // 14-18
-    r[3] = b18to24 as Field;
-    r[4] = bytes[3] as Field;
-    r[5] = bytes[4] as Field + (b40to41 as Field) * 256;
-    r[6] = b41to48 as Field;
-    r[7] = bytes[6] as Field;
-    r[8] = bytes[7] as Field;
+    r[0] = bytes[0] as u32; // 0-8
+    r[1] = b8to14 as u32; // 8-14
+    r[2] = (b14to16 + (b16to18 << 2)) as u32; // 14-18
+    r[3] = b18to24 as u32;
+    r[4] = bytes[3] as u32;
+    r[5] = bytes[4] as u32 + (b40to41 as u32) * 256;
+    r[6] = b41to48 as u32;
+    r[7] = bytes[6] as u32;
+    r[8] = bytes[7] as u32;
     r
 }
 
-unconstrained fn decompose_a(a: Field) -> [Field; 9] {
-    let mut r: [Field; 9] = [0; 9];
+unconstrained fn decompose_a(a: Field) -> [u32; 9] {
+    let mut r: [u32; 9] = [0; 9];
     let mut bytes = a.to_le_bytes::<8>();
     let b24to28 = bytes[3] & 15;
     let b28to32 = bytes[3] >> 4;
     let b32to34 = bytes[4] & 3;
     let b34to39 = (bytes[4] >> 2) & 31;
     let b39to40 = bytes[4] >> 7;
-    r[0] = bytes[0] as Field;
-    r[1] = bytes[1] as Field;
-    r[2] = bytes[2] as Field;
-    r[3] = b24to28 as Field;
-    r[4] = (b28to32 + (b32to34 << 4)) as Field;
-    r[5] = b34to39 as Field;
-    r[6] = b39to40 as Field + (bytes[5] as Field * 2);
-    r[7] = bytes[6] as Field;
-    r[8] = bytes[7] as Field;
+    r[0] = bytes[0] as u32;
+    r[1] = bytes[1] as u32;
+    r[2] = bytes[2] as u32;
+    r[3] = b24to28 as u32;
+    r[4] = (b28to32 + (b32to34 << 4)) as u32;
+    r[5] = b34to39 as u32;
+    r[6] = b39to40 as u32 + (bytes[5] as u32 * 2);
+    r[7] = bytes[6] as u32;
+    r[8] = bytes[7] as u32;
     r
     /*
     let mut a64 = a as u64;
@@ -112,34 +112,34 @@ impl EncodedWitness {
     }
 }
 
-unconstrained fn __decompose_witness(w: Field) -> [Field; 12] {
+unconstrained fn __decompose_witness(w: Field) -> [u32; 12] {
     //   1, 5, 1, 1, 8, 3, 8, 8, 8, 9, 9, 3
     let mut acc: u64 = w as u64;
-    let mut r: [Field; 12] = [0; 12];
+    let mut r: [u32; 12] = [0; 12];
 
-    r[0] = (acc & 1) as Field;
+    r[0] = (acc & 1) as u32;
     acc >>= 1;
-    r[1] = (acc & 31) as Field;
+    r[1] = (acc & 31) as u32;
     acc >>= 5;
-    r[2] = (acc & 1) as Field;
+    r[2] = (acc & 1) as u32;
     acc >>= 1;
-    r[3] = (acc & 1) as Field;
+    r[3] = (acc & 1) as u32;
     acc >>= 1;
-    r[4] = (acc & 255) as Field;
+    r[4] = (acc & 255) as u32;
     acc >>= 8;
-    r[5] = (acc & 7) as Field;
+    r[5] = (acc & 7) as u32;
     acc >>= 3;
-    r[6] = (acc & 255) as Field;
+    r[6] = (acc & 255) as u32;
     acc >>= 8;
-    r[7] = (acc & 255) as Field;
+    r[7] = (acc & 255) as u32;
     acc >>= 8;
-    r[8] = (acc & 255) as Field;
+    r[8] = (acc & 255) as u32;
     acc >>= 8;
-    r[9] = (acc & 511) as Field;
+    r[9] = (acc & 511) as u32;
     acc >>= 9;
-    r[10] = (acc & 511) as Field;
+    r[10] = (acc & 511) as u32;
     acc >>= 9;
-    r[11] = (acc & 7) as Field;
+    r[11] = (acc & 7) as u32;
     r
 }
 
@@ -268,31 +268,31 @@ pub(crate) fn encode_message_extension(w: Field) -> EncodedWitness {
     //        We need to validate the correctness of these slice claims by asserting their sum equals `w`,
     //        and we also need to validate the bit range of each slice
     //        (we get an implicit range constraint for free by indexing our BASE4_ENCODE_TABLE lookup tables)
-    let s: [Field; 12] = unsafe { __decompose_witness(w) };
+    let s: [u32; 12] = unsafe { __decompose_witness(w) };
 
-    let mut reconstructed = s[11];
+    let mut reconstructed: Field = s[11] as Field;
     reconstructed *= 512;
-    reconstructed += s[10];
+    reconstructed += s[10] as Field;
     reconstructed *= 512;
-    reconstructed += s[9];
+    reconstructed += s[9] as Field;
     reconstructed *= 256;
-    reconstructed += s[8];
+    reconstructed += s[8] as Field;
     reconstructed *= 256;
-    reconstructed += s[7];
+    reconstructed += s[7] as Field;
     reconstructed *= 256;
-    reconstructed += s[6];
+    reconstructed += s[6] as Field;
     reconstructed *= 8;
-    reconstructed += s[5];
+    reconstructed += s[5] as Field;
     reconstructed *= 256;
-    reconstructed += s[4];
+    reconstructed += s[4] as Field;
     reconstructed *= 2;
-    reconstructed += s[3];
+    reconstructed += s[3] as Field;
     reconstructed *= 2;
-    reconstructed += s[2];
+    reconstructed += s[2] as Field;
     reconstructed *= 32;
-    reconstructed += s[1];
+    reconstructed += s[1] as Field;
     reconstructed *= 2;
-    reconstructed += s[0];
+    reconstructed += s[0] as Field;
     assert_eq(reconstructed, w);
 
     let mut base4_encoded_slices: [Field; 12] = [0; 12];
@@ -373,23 +373,23 @@ pub(crate) fn encode_e(e: Field) -> EncodedChoose {
     //        (we get an implicit range constraint for free by indexing our BASE4_ENCODE_TABLE lookup tables)
     let s = unsafe { decompose_e(e) };
 
-    let mut reconstructed = s[8];
+    let mut reconstructed: Field = s[8] as Field;
     reconstructed *= 256;
-    reconstructed += s[7];
+    reconstructed += s[7] as Field;
     reconstructed *= 128;
-    reconstructed += s[6];
+    reconstructed += s[6] as Field;
     reconstructed *= 512;
-    reconstructed += s[5];
+    reconstructed += s[5] as Field;
     reconstructed *= 256;
-    reconstructed += s[4];
+    reconstructed += s[4] as Field;
     reconstructed *= 64;
-    reconstructed += s[3];
+    reconstructed += s[3] as Field;
     reconstructed *= 16;
-    reconstructed += s[2];
+    reconstructed += s[2] as Field;
     reconstructed *= 64;
-    reconstructed += s[1];
+    reconstructed += s[1] as Field;
     reconstructed *= 256;
-    reconstructed += s[0];
+    reconstructed += s[0] as Field;
     assert_eq(reconstructed, e); // 7 gates?
 
     // 8, 6, 4, 6, 8, 9, 7, 8, 8
@@ -458,23 +458,23 @@ pub(crate) fn encode_a(a: Field) -> EncodedMajority {
 
     // 8,8,8,4,6,5,9,8,8
     // 7 gates?
-    let mut reconstructed = s[8];
+    let mut reconstructed: Field = s[8] as Field;
     reconstructed *= 256;
-    reconstructed += s[7];
+    reconstructed += s[7] as Field;
     reconstructed *= 512;
-    reconstructed += s[6];
+    reconstructed += s[6] as Field;
     reconstructed *= 32;
-    reconstructed += s[5];
+    reconstructed += s[5] as Field;
     reconstructed *= 64;
-    reconstructed += s[4];
+    reconstructed += s[4] as Field;
     reconstructed *= 16;
-    reconstructed += s[3];
+    reconstructed += s[3] as Field;
     reconstructed *= 256;
-    reconstructed += s[2];
+    reconstructed += s[2] as Field;
     reconstructed *= 256;
-    reconstructed += s[1];
+    reconstructed += s[1] as Field;
     reconstructed *= 256;
-    reconstructed += s[0];
+    reconstructed += s[0] as Field;
     assert_eq(reconstructed, a);
 
     let mut base4_encoded_slices: [Field; 9] = [0; 9];
@@ -525,13 +525,13 @@ pub(crate) fn encode_a(a: Field) -> EncodedMajority {
     EncodedMajority { raw: a, a: a_ror0, ror28, ror34, ror39 }
 }
 
-unconstrained fn __split_into_base4_5bit_slices(encoded: Field) -> [Field; 13] {
+unconstrained fn __split_into_base4_5bit_slices(encoded: Field) -> [u32; 13] {
     let mut acc = encoded as u128;
 
-    let mut slices: [Field; 13] = [0; 13];
+    let mut slices: [u32; 13] = [0; 13];
 
     for i in 0..13 {
-        slices[i] = (acc & 1023) as Field;
+        slices[i] = (acc & 1023) as u32;
         acc >>= 10;
     }
 
@@ -548,7 +548,7 @@ pub(crate) fn decode_majority(a: Field, b: Field, c: Field) -> Field {
     let mut decoded: Field = 0;
     for i in 0..13 {
         reconstructed *= 1024;
-        reconstructed += slices[12 - i];
+        reconstructed += slices[12 - i] as Field;
         decoded *= 32;
         decoded += BASE4_MAJORITY_DECODE_5BIT_TABLE[slices[12 - i]];
     }
@@ -568,7 +568,7 @@ pub(crate) fn decode_choose(e: Field, f: Field, g: Field) -> Field {
     let mut decoded_lhs: Field = 0;
     for i in 0..13 {
         reconstructed *= 1024;
-        reconstructed += lhs_slices[12 - i];
+        reconstructed += lhs_slices[12 - i] as Field;
         decoded_lhs *= 32;
         decoded_lhs += BASE4_PARTIAL_CHOOSE_DECODE_5BIT_TABLE[lhs_slices[12 - i]];
     }
@@ -582,7 +582,7 @@ pub(crate) fn decode_choose(e: Field, f: Field, g: Field) -> Field {
     let mut decoded_rhs: Field = 0;
     for i in 0..13 {
         reconstructed *= 1024;
-        reconstructed += rhs_slices[12 - i];
+        reconstructed += rhs_slices[12 - i] as Field;
         decoded_rhs *= 32;
         decoded_rhs += BASE4_MAJORITY_DECODE_5BIT_TABLE[rhs_slices[12 - i]];
     }
@@ -604,7 +604,7 @@ pub(crate) fn decode_xor(encoded: Field) -> Field {
     let mut decoded: Field = 0;
     for i in 0..13 {
         reconstructed *= 1024;
-        reconstructed += slices[12 - i];
+        reconstructed += slices[12 - i] as Field;
         decoded *= 32;
         decoded += BASE4_XOR_DECODE_5BIT_TABLE[slices[12 - i]];
     }
