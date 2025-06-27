@@ -59,13 +59,13 @@ impl EncodedWitness {
 }
 
 /// Take an input that is a u64 encoded via base4, and split it into 5-bit slices encoded via base64
-unconstrained fn __split_into_base4_5bit_slices(encoded: Field) -> [Field; 13] {
+unconstrained fn __split_into_base4_5bit_slices(encoded: Field) -> [u32; 13] {
     let mut acc = encoded as u128;
 
-    let mut slices: [Field; 13] = [0; 13];
+    let mut slices: [u32; 13] = [0; 13];
 
     for i in 0..13 {
-        slices[i] = (acc & 1023) as Field;
+        slices[i] = (acc & 1023) as u32;
         acc >>= 10;
     }
 
@@ -188,36 +188,25 @@ pub(crate) fn encode_message_extension(w: Field) -> EncodedWitness {
     let mut reconstructed = s[11] as Field;
     reconstructed *= 512;
     reconstructed += s[10] as Field;
-    reconstructed += s[10] as Field;
     reconstructed *= 512;
     reconstructed += s[9] as Field;
-    reconstructed += s[9] as Field;
     reconstructed *= 256;
-    reconstructed += s[8] as Field;
     reconstructed += s[8] as Field;
     reconstructed *= 256;
     reconstructed += s[7] as Field;
-    reconstructed += s[7] as Field;
     reconstructed *= 256;
-    reconstructed += s[6] as Field;
     reconstructed += s[6] as Field;
     reconstructed *= 8;
     reconstructed += s[5] as Field;
-    reconstructed += s[5] as Field;
     reconstructed *= 256;
     reconstructed += s[4] as Field;
-    reconstructed += s[4] as Field;
     reconstructed *= 2;
     reconstructed += s[3] as Field;
-    reconstructed += s[3] as Field;
     reconstructed *= 2;
-    reconstructed += s[2] as Field;
     reconstructed += s[2] as Field;
     reconstructed *= 32;
     reconstructed += s[1] as Field;
-    reconstructed += s[1] as Field;
     reconstructed *= 2;
-    reconstructed += s[0] as Field;
     reconstructed += s[0] as Field;
     assert_eq(reconstructed, w);
 
@@ -334,24 +323,17 @@ pub(crate) fn encode_e(e: Field) -> EncodedChoose {
     let mut reconstructed = s[8] as Field;
     reconstructed *= 256;
     reconstructed += s[7] as Field;
-    reconstructed += s[7] as Field;
     reconstructed *= 128;
     reconstructed += s[6] as Field;
-    reconstructed += s[6] as Field;
     reconstructed *= 512;
-    reconstructed += s[5] as Field;
-    reconstructed += s[5] as Field;
+    reconstructed += s[5] as Field; 
     reconstructed *= 256;
     reconstructed += s[4] as Field;
-    reconstructed += s[4] as Field;
     reconstructed *= 64;
-    reconstructed += s[3] as Field;
     reconstructed += s[3] as Field;
     reconstructed *= 16;
     reconstructed += s[2] as Field;
-    reconstructed += s[2] as Field;
     reconstructed *= 64;
-    reconstructed += s[1] as Field;
     reconstructed += s[1] as Field;
     reconstructed *= 256;
     reconstructed += s[0] as Field;
@@ -426,27 +408,19 @@ pub(crate) fn encode_a(a: Field) -> EncodedMajority {
     let mut reconstructed = s[8] as Field;
     reconstructed *= 256;
     reconstructed += s[7] as Field;
-    reconstructed += s[7] as Field;
     reconstructed *= 512;
-    reconstructed += s[6] as Field;
     reconstructed += s[6] as Field;
     reconstructed *= 32;
     reconstructed += s[5] as Field;
-    reconstructed += s[5] as Field;
     reconstructed *= 64;
-    reconstructed += s[4] as Field;
     reconstructed += s[4] as Field;
     reconstructed *= 16;
     reconstructed += s[3] as Field;
-    reconstructed += s[3] as Field;
     reconstructed *= 256;
-    reconstructed += s[2] as Field;
     reconstructed += s[2] as Field;
     reconstructed *= 256;
     reconstructed += s[1] as Field;
-    reconstructed += s[1] as Field;
     reconstructed *= 256;
-    reconstructed += s[0] as Field;
     reconstructed += s[0] as Field;
     assert_eq(reconstructed, a);
 
@@ -620,7 +594,6 @@ pub(crate) fn decode_xor(encoded: Field) -> Field {
     //        (we get an implicit range constraint for free by indexing our BASE4_XOR_DECODE_5BIT_TABLE lookup table)
     let slices = unsafe { __split_into_base4_5bit_slices(encoded) };
 
-    // println(f"encoded slices {slices}");
     let mut reconstructed: Field = 0;
     let mut decoded: Field = 0;
 
