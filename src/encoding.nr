@@ -73,8 +73,8 @@ unconstrained fn __split_into_base4_5bit_slices(encoded: Field) -> [Field; 13] {
 }
 
 /// Split an input Field element `e` (known to be 64 bits) into slices that can be efficiently composed to produce inputs to `EncodedChoose`
-unconstrained fn __decompose_e(e: Field) -> [Field; 9] {
-    let mut r: [Field; 9] = [0; 9];
+unconstrained fn __decompose_e(e: Field) -> [u32; 9] {
+    let mut r: [u32; 9] = [0; 9];
     let mut bytes = e.to_le_bytes::<8>();
     let b8to14 = bytes[1] & 63;
     let b14to16 = bytes[1] >> 6;
@@ -83,69 +83,69 @@ unconstrained fn __decompose_e(e: Field) -> [Field; 9] {
     let b40to41 = bytes[5] & 1;
     let b41to48 = bytes[5] >> 1;
 
-    r[0] = bytes[0] as Field; // 0-8
-    r[1] = b8to14 as Field; // 8-14
-    r[2] = (b14to16 + (b16to18 << 2)) as Field; // 14-18
-    r[3] = b18to24 as Field;
-    r[4] = bytes[3] as Field;
-    r[5] = bytes[4] as Field + (b40to41 as Field) * 256;
-    r[6] = b41to48 as Field;
-    r[7] = bytes[6] as Field;
-    r[8] = bytes[7] as Field;
+    r[0] = bytes[0] as u32; // 0-8
+    r[1] = b8to14 as u32; // 8-14
+    r[2] = (b14to16 + (b16to18 << 2)) as u32; // 14-18
+    r[3] = b18to24 as u32;
+    r[4] = bytes[3] as u32;
+    r[5] = bytes[4] as u32 + (b40to41 as u32) * 256;
+    r[6] = b41to48 as u32;
+    r[7] = bytes[6] as u32;
+    r[8] = bytes[7] as u32;
     r
 }
 
 /// Split an input Field element `a` (known to be 64 bits) into slices that can be efficiently composed to produce inputs to `EncodedMajority`
-unconstrained fn __decompose_a(a: Field) -> [Field; 9] {
-    let mut r: [Field; 9] = [0; 9];
+unconstrained fn __decompose_a(a: Field) -> [u32; 9] {
+    let mut r: [u32; 9] = [0; 9];
     let mut bytes = a.to_le_bytes::<8>();
     let b24to28 = bytes[3] & 15;
     let b28to32 = bytes[3] >> 4;
     let b32to34 = bytes[4] & 3;
     let b34to39 = (bytes[4] >> 2) & 31;
     let b39to40 = bytes[4] >> 7;
-    r[0] = bytes[0] as Field;
-    r[1] = bytes[1] as Field;
-    r[2] = bytes[2] as Field;
-    r[3] = b24to28 as Field;
-    r[4] = (b28to32 + (b32to34 << 4)) as Field;
-    r[5] = b34to39 as Field;
-    r[6] = b39to40 as Field + (bytes[5] as Field * 2);
-    r[7] = bytes[6] as Field;
-    r[8] = bytes[7] as Field;
+    r[0] = bytes[0] as u32;
+    r[1] = bytes[1] as u32;
+    r[2] = bytes[2] as u32;
+    r[3] = b24to28 as u32;
+    r[4] = (b28to32 + (b32to34 << 4)) as u32;
+    r[5] = b34to39 as u32;
+    r[6] = b39to40 as u32 + (bytes[5] as u32 * 2);
+    r[7] = bytes[6] as u32;
+    r[8] = bytes[7] as u32;
     r
 }
 
 /// Split an input Field element `w` (known to be 64 bits) into slices that can be efficiently composed to produce inputs to `EncodedWitness`
-unconstrained fn __decompose_witness(w: Field) -> [Field; 12] {
+unconstrained fn __decompose_witness(w: Field) -> [u32; 12] {
     // bit slice structure is:
     // 1, 5, 1, 1, 8, 3, 8, 8, 8, 9, 9, 3
     let mut acc: u64 = w as u64;
-    let mut r: [Field; 12] = [0; 12];
+    let mut r: [u32; 12] = [0; 12];
 
-    r[0] = (acc & 1) as Field;
+    r[0] = (acc & 1) as u32;
     acc >>= 1;
-    r[1] = (acc & 31) as Field;
+    r[1] = (acc & 31) as u32;
     acc >>= 5;
-    r[2] = (acc & 1) as Field;
+    r[2] = (acc & 1) as u32;
     acc >>= 1;
-    r[3] = (acc & 1) as Field;
+    r[3] = (acc & 1) as u32;
     acc >>= 1;
-    r[4] = (acc & 255) as Field;
+    r[4] = (acc & 255) as u32;
     acc >>= 8;
-    r[5] = (acc & 7) as Field;
+    r[5] = (acc & 7) as u32;
     acc >>= 3;
-    r[6] = (acc & 255) as Field;
+    r[6] = (acc & 255) as u32;
     acc >>= 8;
-    r[7] = (acc & 255) as Field;
+    r[7] = (acc & 255) as u32;
     acc >>= 8;
-    r[8] = (acc & 255) as Field;
+    r[8] = (acc & 255) as u32;
     acc >>= 8;
-    r[9] = (acc & 511) as Field;
+    r[9] = (acc & 511) as u32;
     acc >>= 9;
-    r[10] = (acc & 511) as Field;
+    r[10] = (acc & 511) as u32;
     acc >>= 9;
-    r[11] = (acc & 7) as Field;
+    r[11] = (acc & 7) as u32;
     r
 }
 
@@ -159,33 +159,33 @@ pub(crate) fn encode_message_extension(w: Field) -> EncodedWitness {
     //        We need to validate the correctness of these slice claims by asserting their sum equals `w`,
     //        and we also need to validate the bit range of each slice
     //        (we get an implicit range constraint for free by indexing our BASE4_ENCODE_TABLE lookup tables)
-    let s: [Field; 12] = unsafe { __decompose_witness(w) };
+    let s: [u32; 12] = unsafe { __decompose_witness(w) };
 
     // Validate the sum of the slices equals the original input `w`
     // Note: we range constrain the slices later on in the function
-    let mut reconstructed = s[11];
+    let mut reconstructed = s[11] as Field;
     reconstructed *= 512;
-    reconstructed += s[10];
+    reconstructed += s[10] as Field;
     reconstructed *= 512;
-    reconstructed += s[9];
+    reconstructed += s[9] as Field;
     reconstructed *= 256;
-    reconstructed += s[8];
+    reconstructed += s[8] as Field;
     reconstructed *= 256;
-    reconstructed += s[7];
+    reconstructed += s[7] as Field;
     reconstructed *= 256;
-    reconstructed += s[6];
+    reconstructed += s[6] as Field;
     reconstructed *= 8;
-    reconstructed += s[5];
+    reconstructed += s[5] as Field;
     reconstructed *= 256;
-    reconstructed += s[4];
+    reconstructed += s[4] as Field;
     reconstructed *= 2;
-    reconstructed += s[3];
+    reconstructed += s[3] as Field;
     reconstructed *= 2;
-    reconstructed += s[2];
+    reconstructed += s[2] as Field;
     reconstructed *= 32;
-    reconstructed += s[1];
+    reconstructed += s[1] as Field;
     reconstructed *= 2;
-    reconstructed += s[0];
+    reconstructed += s[0] as Field;
     assert_eq(reconstructed, w);
 
     let mut base4_encoded_slices: [Field; 12] = [0; 12];
@@ -298,23 +298,23 @@ pub(crate) fn encode_e(e: Field) -> EncodedChoose {
 
     // Validate the sum of the slices equals the original input `e`
     // Note: we range constrain the slices later on in the function
-    let mut reconstructed = s[8];
+    let mut reconstructed = s[8] as Field;
     reconstructed *= 256;
-    reconstructed += s[7];
+    reconstructed += s[7] as Field;
     reconstructed *= 128;
-    reconstructed += s[6];
+    reconstructed += s[6] as Field;
     reconstructed *= 512;
-    reconstructed += s[5];
+    reconstructed += s[5] as Field;
     reconstructed *= 256;
-    reconstructed += s[4];
+    reconstructed += s[4] as Field;
     reconstructed *= 64;
-    reconstructed += s[3];
+    reconstructed += s[3] as Field;
     reconstructed *= 16;
-    reconstructed += s[2];
+    reconstructed += s[2] as Field;
     reconstructed *= 64;
-    reconstructed += s[1];
+    reconstructed += s[1] as Field;
     reconstructed *= 256;
-    reconstructed += s[0];
+    reconstructed += s[0] as Field;
     assert_eq(reconstructed, e); // 4 gates?
 
     // convert our input slices `s` into base4-encoded slices
@@ -383,23 +383,23 @@ pub(crate) fn encode_a(a: Field) -> EncodedMajority {
 
     // Validate the sum of the slices equals the original input `e`
     // Note: we range constrain the slices later on in the function
-    let mut reconstructed = s[8];
+    let mut reconstructed = s[8] as Field;
     reconstructed *= 256;
-    reconstructed += s[7];
+    reconstructed += s[7] as Field;
     reconstructed *= 512;
-    reconstructed += s[6];
+    reconstructed += s[6] as Field;
     reconstructed *= 32;
-    reconstructed += s[5];
+    reconstructed += s[5] as Field;
     reconstructed *= 64;
-    reconstructed += s[4];
+    reconstructed += s[4] as Field;
     reconstructed *= 16;
-    reconstructed += s[3];
+    reconstructed += s[3] as Field;
     reconstructed *= 256;
-    reconstructed += s[2];
+    reconstructed += s[2] as Field;
     reconstructed *= 256;
-    reconstructed += s[1];
+    reconstructed += s[1] as Field;
     reconstructed *= 256;
-    reconstructed += s[0];
+    reconstructed += s[0] as Field;
     assert_eq(reconstructed, a);
 
     let mut base4_encoded_slices: [Field; 9] = [0; 9];
