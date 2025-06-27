@@ -5,6 +5,41 @@ use crate::tables::{
     BASE4_PARTIAL_CHOOSE_DECODE_5BIT_TABLE, BASE4_POWERS, BASE4_XOR_DECODE_5BIT_TABLE,
 };
 
+// W2_POWER_SUM represents scalars that each base4_encoded_slices member must be multiplied by, in order to produce
+// `encode(raw.rotate19) + encode(raw.rotate61) + encode(raw >> 6)`
+
+global W2_POWER_SUM: [Field; 12] = [
+    0x040000000000000000000040,
+    0x100000000000000000000100,
+    0x40000000000000000000040001,
+    0x0100000000000000000000100004,
+    0x0400000000000000000000400010,
+    0x04000000000000000000004000100000,
+    0x100004000001,
+    0x1000040000010000,
+    0x10000400000100000000,
+    0x100004000001000000000000,
+    0x4000100000040000000000000000,
+    0x4000001000000000000000000001,
+];
+
+// W15_POWER_SUM represents scalars that each base4_encoded_slices member must be multiplied by, in order to produce
+// `encode(raw.rotate1) + encode(raw.rotate8) + encode(raw >> 7)`
+global W15_POWER_SUM: [Field; 12] = [
+    0x40010000000000000000000000000000,
+    0x040000000000000000000000000001,
+    0x10000000000000000000000000000400,
+    0x40000000000000000000000000001001,
+    0x4005,
+    0x40050000,
+    0x1001400000,
+    0x10014000000000,
+    0x100140000000000000,
+    0x1001400000000000000000,
+    0x40050000000000000000000000,
+    0x01001400000000000000000000000000,
+];
+
 /// Encodes the u64 inputs to the `Majority` function in an extended Base4 represeentation
 ///
 /// *param* raw: the input 64-bit limb
@@ -226,40 +261,6 @@ pub(crate) fn encode_message_extension(w: Field) -> EncodedWitness {
     base4_encoded_slices[9] = BASE4_ENCODE_9BIT_TABLE[s[9]];
     base4_encoded_slices[10] = BASE4_ENCODE_9BIT_TABLE[s[10]];
     base4_encoded_slices[11] = BASE4_ENCODE_3BIT_TABLE[s[11]];
-
-    // W2_POWER_SUM represents scalars that each base4_encoded_slices member must be multiplied by, in order to produce
-    // `encode(raw.rotate19) + encode(raw.rotate61) + encode(raw >> 6)`
-    let W2_POWER_SUM: [Field; 12] = [
-        0x040000000000000000000040,
-        0x100000000000000000000100,
-        0x40000000000000000000040001,
-        0x0100000000000000000000100004,
-        0x0400000000000000000000400010,
-        0x04000000000000000000004000100000,
-        0x100004000001,
-        0x1000040000010000,
-        0x10000400000100000000,
-        0x100004000001000000000000,
-        0x4000100000040000000000000000,
-        0x4000001000000000000000000001,
-    ];
-
-    // W15_POWER_SUM represents scalars that each base4_encoded_slices member must be multiplied by, in order to produce
-    // `encode(raw.rotate1) + encode(raw.rotate8) + encode(raw >> 7)`
-    let W15_POWER_SUM: [Field; 12] = [
-        0x40010000000000000000000000000000,
-        0x040000000000000000000000000001,
-        0x10000000000000000000000000000400,
-        0x40000000000000000000000000001001,
-        0x4005,
-        0x40050000,
-        0x1001400000,
-        0x10014000000000,
-        0x100140000000000000,
-        0x1001400000000000000000,
-        0x40050000000000000000000000,
-        0x01001400000000000000000000000000,
-    ];
 
     // 4 gates
     let mut w2_rotate_sum: Field = base4_encoded_slices[0] * W2_POWER_SUM[0];
