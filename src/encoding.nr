@@ -326,7 +326,7 @@ pub(crate) fn encode_e(e: Field) -> EncodedChoose {
     reconstructed *= 128;
     reconstructed += s[6] as Field;
     reconstructed *= 512;
-    reconstructed += s[5] as Field; 
+    reconstructed += s[5] as Field;
     reconstructed *= 256;
     reconstructed += s[4] as Field;
     reconstructed *= 64;
