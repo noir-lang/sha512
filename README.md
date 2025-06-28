@@ -21,6 +21,15 @@ with the following command.
 
 The benchmark will be generated at `./gates_report.json`.
 
+Current benchmarks as of 1 Mar 2025
+
+| num blocks hashed | num bytes hashed | gates for `sha512::hash` | gates for `sha512::digest_var` |
+| --- | --- | --- | --- |
+| 1 block | 111 | 39,476 | 41,261 |
+| 2 blocks | 239 ||66,927 | 69,816 |
+| 3 blocks | 367 | 94,377 | 98,355 |
+| 4 blocks | 495 | 121,826 | 126,914 |
+
 ## Installation
 
 In your _Nargo.toml_ file, add the version of this library you would like to install under dependency:

@@ -1,30 +1,52 @@
-use crate::permutation::digest;
+use crate::formatting::msg_u8_to_u64;
 
-// compression benchmark is 41924
-// NOTE: does this align with expectations? Seems high
-// #[export]
-// fn bench_compression(input: [u8; 128]) {
-//     let foo = msg_u8_to_u64(input);
-//     let r = sha512_compression(foo, [0; 8]);
-//     println(f"{r}");
-// }
-// cost of 2 hashes = 115,221
-// cost of 1 hash = 63,938
-// extra hash = 51k, 13k gate setup? seems appropriate
-// note: a lot of cost overhead vs compression algorithm. A lot of this will be witness extension, but maybe there are overheads we can cut?
+global MAX_BYTES_1_BLOCK: u32 = 111;
+global MAX_BYTES_2_BLOCKS: u32 = MAX_BYTES_1_BLOCK + 128;
+global MAX_BYTES_3_BLOCKS: u32 = MAX_BYTES_2_BLOCKS + 128;
+global MAX_BYTES_4_BLOCKS: u32 = MAX_BYTES_3_BLOCKS + 128;
+
 #[export]
-fn bench_digest(input: [u8; 128]) {
-    let result = digest::<_, 1>(input);
+fn bench_sha512_compression(input: [u8; 128], h: [u64; 8]) -> [u64; 8] {
+    let r = crate::sha512_compression(msg_u8_to_u64(input), h);
+    r
+}
 
-    let expected: [u8; 64] = [
-        0xcf, 0x83, 0xe1, 0x35, 0x7e, 0xef, 0xb8, 0xbd, 0xf1, 0x54, 0x28, 0x50, 0xd6, 0x6d, 0x80,
-        0x07, 0xd6, 0x20, 0xe4, 0x05, 0x0b, 0x57, 0x15, 0xdc, 0x83, 0xf4, 0xa9, 0x21, 0xd3, 0x6c,
-        0xe9, 0xce, 0x47, 0xd0, 0xd1, 0x3c, 0x5d, 0x85, 0xf2, 0xb0, 0xff, 0x83, 0x18, 0xd2, 0x87,
-        0x7e, 0xec, 0x2f, 0x63, 0xb9, 0x31, 0xbd, 0x47, 0x41, 0x7a, 0x81, 0xa5, 0x38, 0x32, 0x7a,
-        0xf9, 0x27, 0xda, 0x3e,
-    ];
+#[export]
+fn bench_sha512_1_block(input: [u8; MAX_BYTES_1_BLOCK]) -> [u8; 64] {
+    crate::sha512::digest(input)
+}
 
-    println(f"result {result}");
-    println(f"expected {expected}");
-    assert_eq(result, expected);
+#[export]
+fn bench_sha512_2_blocks(input: [u8; MAX_BYTES_2_BLOCKS]) -> [u8; 64] {
+    crate::sha512::digest(input)
+}
+
+#[export]
+fn bench_sha512_3_blocks(input: [u8; MAX_BYTES_3_BLOCKS]) -> [u8; 64] {
+    crate::sha512::digest(input)
+}
+
+#[export]
+fn bench_sha512_4_blocks(input: [u8; MAX_BYTES_4_BLOCKS]) -> [u8; 64] {
+    crate::sha512::digest(input)
+}
+
+#[export]
+fn bench_sha512_var_1_block(input: BoundedVec<u8, MAX_BYTES_1_BLOCK>) -> [u8; 64] {
+    crate::sha512::sha512_var(input)
+}
+
+#[export]
+fn bench_sha512_var_2_blocks(input: BoundedVec<u8, MAX_BYTES_2_BLOCKS>) -> [u8; 64] {
+    crate::sha512::sha512_var(input)
+}
+
+#[export]
+fn bench_sha512_var_3_blocks(input: BoundedVec<u8, MAX_BYTES_3_BLOCKS>) -> [u8; 64] {
+    crate::sha512::sha512_var(input)
+}
+
+#[export]
+fn bench_sha512_var_4_blocks(input: BoundedVec<u8, MAX_BYTES_4_BLOCKS>) -> [u8; 64] {
+    crate::sha512::sha512_var(input)
 }
