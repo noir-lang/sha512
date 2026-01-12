@@ -9,6 +9,7 @@ use crate::encoding::{encode_a, encode_e};
 use crate::formatting::{msg_u8_to_u64, reduce_modulo_64, to_u64};
 use crate::permutation::{compress, extend_message, RoundState};
 use crate::tables::{SHA384_INITIAL_HASH_VALUES, SHA512_INITIAL_HASH_VALUES};
+use std::ops::WrappingAdd;
 pub global SHA512_LENGTH_PARAMETER_BYTES: u32 = 16;
 
 /// Size of the message block when packed as 8-byte integer array.
@@ -76,7 +77,8 @@ fn digest<let N: u32, let IS_SHA512: u1>(msg: [u8; N]) -> [u8; 64] {
     let num_blocks = (N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE;
 
     let num_padded_bytes = num_blocks * SHA512_BLOCK_SIZE;
-    let mut padded_msg: [u8; ((N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE) * SHA512_BLOCK_SIZE] = [
+    let mut padded_msg
+        : [u8; ((N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE) * SHA512_BLOCK_SIZE] = [
         0; ((N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE)
             * SHA512_BLOCK_SIZE
     ];
@@ -131,7 +133,8 @@ fn digest_var<let N: u32, let IS_SHA512: u1>(msg: BoundedVec<u8, N>) -> [u8; 64]
 
     let num_blocks = (N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE;
 
-    let mut padded_msg: [u8; ((N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE) * SHA512_BLOCK_SIZE] = [
+    let mut padded_msg
+        : [u8; ((N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE) * SHA512_BLOCK_SIZE] = [
         0; ((N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE)
             * SHA512_BLOCK_SIZE
     ];
@@ -167,7 +170,7 @@ fn digest_var<let N: u32, let IS_SHA512: u1>(msg: BoundedVec<u8, N>) -> [u8; 64]
         }
         c = sha512_compression(msg_u8_to_u64(block_bytes), h);
         for j in 0..8 {
-            h[j] = std::wrapping_add(h[j], c[j]);
+            h[j] = h[j].wrapping_add(c[j]);
         }
         if (i < num_used_blocks) {
             output_h = h;
