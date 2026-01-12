@@ -4,6 +4,7 @@ mod generate_tables;
 mod encoding;
 mod benchmarks;
 mod formatting;
+mod oracle_tests;
 
 use crate::encoding::{encode_a, encode_e};
 use crate::formatting::{msg_u8_to_u64, reduce_modulo_64, to_u64};
@@ -225,8 +226,6 @@ pub mod sha512 {
             0xa5, 0x38, 0x32, 0x7a, 0xf9, 0x27, 0xda, 0x3e,
         ];
 
-        println(f"result {result}");
-        println(f"expected {expected}");
         assert_eq(result, expected);
     }
 
@@ -243,8 +242,6 @@ pub mod sha512 {
             0x2a, 0x9a, 0xc9, 0x4f, 0xa5, 0x4c, 0xa4, 0x9f,
         ];
 
-        println(f"result {result}");
-        println(f"expected {expected}");
         assert_eq(result, expected);
         assert_eq(result_var, expected);
     }
@@ -263,8 +260,6 @@ pub mod sha512 {
             0x54, 0xec, 0x63, 0x12, 0x38, 0xca, 0x34, 0x45,
         ];
 
-        println(f"result {result}");
-        println(f"expected {expected}");
         assert_eq(result, expected);
         assert_eq(result_var, expected);
     }
@@ -339,8 +334,6 @@ pub mod sha384 {
             0xd2, 0xf1, 0x48, 0x98, 0xb9, 0x5b,
         ];
 
-        println(f"result {result}");
-        println(f"expected {expected}");
         assert_eq(result, expected);
         assert_eq(result_var, expected);
     }
@@ -358,8 +351,6 @@ pub mod sha384 {
             0xec, 0xa1, 0x34, 0xc8, 0x25, 0xa7,
         ];
 
-        println(f"result {result}");
-        println(f"expected {expected}");
         assert_eq(result, expected);
         assert_eq(result_var, expected);
     }
@@ -377,8 +368,6 @@ pub mod sha384 {
             0x5b, 0x1f, 0xe3, 0xc8, 0x45, 0x2b,
         ];
 
-        println(f"result {result}");
-        println(f"expected {expected}");
         assert_eq(result, expected);
         assert_eq(result_var, expected);
     }
