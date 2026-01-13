@@ -7,7 +7,7 @@ Library that implements SHA512 and SHA384
 
 ## Noir version compatibility
 
-This library is tested against all stable versions of noir from 1.0.0-beta.3.
+This library is tested against all stable versions of noir from 1.0.0-beta.5.
 
 ## Benchmarks
 
@@ -16,10 +16,12 @@ with the following command.
 
 ```bash
 # execute the following
+nargo export
 ./scripts/build-gates-report.sh
+./scripts/build-brillig-report.sh
 ```
 
-The benchmark will be generated at `./gates_report.json`.
+The benchmark will be generated at `./benchmark-opcodes.json`, `./benchmark-circuit.json` and `./benchmark-brillig.json`.
 
 Current benchmarks as of 1 Mar 2025
 
