@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1768306716929,
+  "lastUpdate": 1768306717873,
   "repoUrl": "https://github.com/noir-lang/sha512",
   "entries": {
     "ACIR Opcodes": [
@@ -99,6 +99,107 @@ window.BENCHMARK_DATA = {
             "name": "test_sha512_256.json/main",
             "value": 41373,
             "unit": "acir_opcodes"
+          }
+        ]
+      }
+    ],
+    "Circuit Size": [
+      {
+        "commit": {
+          "author": {
+            "email": "26174818+jialinli98@users.noreply.github.com",
+            "name": "Jialin Li",
+            "username": "jialinli98"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "2ec1d1d99f31325f00f07a42578b7c82483cd3cc",
+          "message": "chore!: remove wrapping_add + update oracle testing + update benchmarks (#13)",
+          "timestamp": "2026-01-13T12:17:35Z",
+          "tree_id": "bb3c4cde5c0c5c3f1e5851737f14e4d4b8a631ca",
+          "url": "https://github.com/noir-lang/sha512/commit/2ec1d1d99f31325f00f07a42578b7c82483cd3cc"
+        },
+        "date": 1768306717857,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "bench_sha512_1_block.json/main",
+            "value": 39746,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_2_blocks.json/main",
+            "value": 67362,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_3_blocks.json/main",
+            "value": 94976,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_4_blocks.json/main",
+            "value": 122592,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_compression.json/main",
+            "value": 40183,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_var_1_block.json/main",
+            "value": 44834,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_var_2_blocks.json/main",
+            "value": 76948,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_var_3_blocks.json/main",
+            "value": 109049,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_var_4_blocks.json/main",
+            "value": 141164,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "test_sha384_1.json/main",
+            "value": 44664,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "test_sha384_100.json/main",
+            "value": 44788,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "test_sha384_256.json/main",
+            "value": 108878,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "test_sha512_1.json/main",
+            "value": 44696,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "test_sha512_100.json/main",
+            "value": 44820,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "test_sha512_256.json/main",
+            "value": 108910,
+            "unit": "circuit_size"
           }
         ]
       }
