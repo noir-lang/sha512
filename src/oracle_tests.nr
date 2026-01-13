@@ -1,14 +1,12 @@
-use super::{sha512, sha384};
+use super::{sha384, sha512};
 
 /// This calls the typescript SHA512 implementation
 #[oracle(getSHA512)]
-unconstrained fn get_sha512_hash<let N: u32>(input: BoundedVec<u8, N>) -> [u8; 64] {
-}
+unconstrained fn get_sha512_hash<let N: u32>(input: BoundedVec<u8, N>) -> [u8; 64] {}
 
 /// This calls the typescript SHA384 implementation
 #[oracle(getSHA384)]
-unconstrained fn get_sha384_hash<let N: u32>(input: BoundedVec<u8, N>) -> [u8; 48] {
-}
+unconstrained fn get_sha384_hash<let N: u32>(input: BoundedVec<u8, N>) -> [u8; 48] {}
 
 /// sanitizes a BoundedVec by constraining its length since the fuzzer can generate invalid lengths
 unconstrained fn sanitize_bounded_vec<let N: u32>(input: BoundedVec<u8, N>) -> BoundedVec<u8, N> {
