@@ -1,9 +1,0 @@
-[package]
-name = "sha256"
-version = "0.1.0"
-edition = "2021"
-
-[dev-dependencies]
-sha2 = "0.10.8"
-proptest = "1.2.0"
-noir-runner = { git = "https://github.com/noir-lang/noir-runner.git", branch = "kb/1.0.0-compatibility" }
