@@ -6,6 +6,9 @@ on:
       - master
   pull_request:
 
+env:
+  MINIMUM_NOIR_VERSION: 1.0.0-beta.18
+
 jobs:
   test:
     name: Benchmark library
@@ -27,7 +30,7 @@ jobs:
       - name: Install bb
         run: |
           curl -L https://raw.githubusercontent.com/AztecProtocol/aztec-packages/refs/heads/next/barretenberg/bbup/install | bash
-          ~/.bb/bbup -nv 1.0.0-beta.17
+          ~/.bb/bbup -nv ${{ env.MINIMUM_NOIR_VERSION }}
 
       - name: Build Noir benchmark programs
         run: nargo export
