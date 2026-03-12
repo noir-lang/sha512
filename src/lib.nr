@@ -44,8 +44,7 @@ pub fn sha512_compression(_input: INT_BLOCK, _state: STATE) -> STATE {
         h: encode_e(_state[7] as Field),
     };
 
-    let mut w: [Field; 80] = extend_message(message_input);
-
+    let w: [Field; 80] = extend_message(message_input);
     compress(&mut state, w);
 
     let mut output: STATE = [0; 8];
@@ -78,7 +77,8 @@ fn digest<let N: u32, let IS_SHA512: u1>(msg: [u8; N]) -> [u8; 64] {
     let num_blocks = (N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE;
 
     let num_padded_bytes = num_blocks * SHA512_BLOCK_SIZE;
-    let mut padded_msg: [u8; ((N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE) * SHA512_BLOCK_SIZE] = [
+    let mut padded_msg
+        : [u8; ((N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE) * SHA512_BLOCK_SIZE] = [
         0; ((N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE)
             * SHA512_BLOCK_SIZE
     ];
@@ -133,7 +133,8 @@ fn digest_var<let N: u32, let IS_SHA512: u1>(msg: BoundedVec<u8, N>) -> [u8; 64]
 
     let num_blocks = (N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE;
 
-    let mut padded_msg: [u8; ((N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE) * SHA512_BLOCK_SIZE] = [
+    let mut padded_msg
+        : [u8; ((N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE) * SHA512_BLOCK_SIZE] = [
         0; ((N + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE)
             * SHA512_BLOCK_SIZE
     ];
@@ -189,11 +190,11 @@ fn digest_var<let N: u32, let IS_SHA512: u1>(msg: BoundedVec<u8, N>) -> [u8; 64]
 /// methods here are interface-compatible with sha256 blackbox fns
 pub mod sha512 {
     pub fn digest<let N: u32>(msg: [u8; N]) -> [u8; 64] {
-        crate::digest::<_, 1>(msg)
+        crate::digest::<_, 1_u1>(msg)
     }
 
     pub fn sha512_var<let N: u32>(msg: BoundedVec<u8, N>) -> [u8; 64] {
-        crate::digest_var::<_, 1>(msg)
+        crate::digest_var::<_, 1_u1>(msg)
     }
 
     // Fuzz testing the sha512 implementation
@@ -287,7 +288,7 @@ pub mod sha512 {
 
 pub mod sha384 {
     pub fn digest<let N: u32>(msg: [u8; N]) -> [u8; 48] {
-        let full_result = crate::digest::<_, 0>(msg);
+        let full_result = crate::digest::<_, 0_u1>(msg);
         let mut r: [u8; 48] = [0; 48];
         for i in 0..48 {
             r[i] = full_result[i];
@@ -296,7 +297,7 @@ pub mod sha384 {
     }
 
     pub fn sha384_var<let N: u32>(msg: BoundedVec<u8, N>) -> [u8; 48] {
-        let full_result = crate::digest_var::<_, 0>(msg);
+        let full_result = crate::digest_var::<_, 0_u1>(msg);
         let mut r: [u8; 48] = [0; 48];
         for i in 0..48 {
             r[i] = full_result[i];

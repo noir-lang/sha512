@@ -2,12 +2,12 @@ name: Noir tests
 
 on:
   push:
-   branches:
-    - master
+    branches:
+      - master
   pull_request:
 
 env:
-  MINIMUM_NOIR_VERSION: v1.0.0-beta.5
+  MINIMUM_NOIR_VERSION: v1.0.0-beta.18
 
 jobs:
   noir-version-list:
@@ -45,7 +45,7 @@ jobs:
         uses: noir-lang/noirup@v0.1.4
         with:
           toolchain: ${{ matrix.toolchain }}
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -56,7 +56,7 @@ jobs:
       - name: Install dependencies
         run: |
           yarn --immutable
-              
+
       - name: Run all tests (including oracle tests)
         working-directory: ./scripts
         run: ./run.sh
