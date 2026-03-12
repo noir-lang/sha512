@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1768306888772,
+  "lastUpdate": 1773337897317,
   "repoUrl": "https://github.com/noir-lang/sha512",
   "entries": {
     "ACIR Opcodes": [
@@ -122,6 +122,105 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/noir-lang/sha512/commit/e1c3a72b2f389a8b30074586f5fbc9782427bc1c"
         },
         "date": 1768306884778,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "bench_sha512_1_block.json/main",
+            "value": 13216,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_2_blocks.json/main",
+            "value": 26101,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_3_blocks.json/main",
+            "value": 38986,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_4_blocks.json/main",
+            "value": 51871,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_compression.json/main",
+            "value": 13392,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_var_1_block.json/main",
+            "value": 14107,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_var_2_blocks.json/main",
+            "value": 27803,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_var_3_blocks.json/main",
+            "value": 41484,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_var_4_blocks.json/main",
+            "value": 55181,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "test_sha384_1.json/main",
+            "value": 13981,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "test_sha384_100.json/main",
+            "value": 14080,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "test_sha384_256.json/main",
+            "value": 41357,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "test_sha512_1.json/main",
+            "value": 13997,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "test_sha512_100.json/main",
+            "value": 14096,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "test_sha512_256.json/main",
+            "value": 41373,
+            "unit": "acir_opcodes"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "jfecher11@gmail.com",
+            "name": "jfecher",
+            "username": "jfecher"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "5e97f9731870f6d532258e455311e799cfd56ed7",
+          "message": "fix!: Use explicit types for constants (#15)\n\nCo-authored-by: Tom French <15848336+TomAFrench@users.noreply.github.com>",
+          "timestamp": "2026-03-12T17:50:36Z",
+          "tree_id": "7c80deee337e5a52a0c60c4f18a14563c0d309df",
+          "url": "https://github.com/noir-lang/sha512/commit/5e97f9731870f6d532258e455311e799cfd56ed7"
+        },
+        "date": 1773337896839,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
