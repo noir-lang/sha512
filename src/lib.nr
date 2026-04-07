@@ -64,9 +64,9 @@ pub fn sha512_compression(_input: INT_BLOCK, _state: STATE) -> STATE {
 /// Input is the message to be hashed, produces a 64-byte output
 /// The `IS_SHA512` generic is used to toggle whether a SHA384 or SHA512 hash is desired
 /// (the only diff between SHA384/SHA512 are different initial starting constants, and the SHA384 hash output is truncated)
-fn digest<let N: u32, let IS_SHA512: u1>(msg: [u8; N]) -> [u8; 64] {
+fn digest<let N: u32, let IS_SHA512: bool>(msg: [u8; N]) -> [u8; 64] {
     // noir-fmt:ignore
-    let mut h: [u64; 8] = if IS_SHA512 == 1 {
+    let mut h: [u64; 8] = if IS_SHA512 {
         SHA512_INITIAL_HASH_VALUES
     } else {
         SHA384_INITIAL_HASH_VALUES
@@ -121,9 +121,9 @@ fn digest<let N: u32, let IS_SHA512: u1>(msg: [u8; N]) -> [u8; 64] {
 /// The `IS_SHA512` generic is used to toggle whether a SHA384 or SHA512 hash is desired
 ///
 /// (the only diff between SHA384/SHA512 are different initial starting constants, and the SHA384 hash output is truncated)
-fn digest_var<let N: u32, let IS_SHA512: u1>(msg: BoundedVec<u8, N>) -> [u8; 64] {
+fn digest_var<let N: u32, let IS_SHA512: bool>(msg: BoundedVec<u8, N>) -> [u8; 64] {
     // noir-fmt:ignore
-    let mut h: [u64; 8] = if IS_SHA512 == 1 {
+    let mut h: [u64; 8] = if IS_SHA512 {
         SHA512_INITIAL_HASH_VALUES
     } else {
         SHA384_INITIAL_HASH_VALUES
@@ -190,11 +190,11 @@ fn digest_var<let N: u32, let IS_SHA512: u1>(msg: BoundedVec<u8, N>) -> [u8; 64]
 /// methods here are interface-compatible with sha256 blackbox fns
 pub mod sha512 {
     pub fn digest<let N: u32>(msg: [u8; N]) -> [u8; 64] {
-        crate::digest::<_, 1_u1>(msg)
+        crate::digest::<_, true>(msg)
     }
 
     pub fn sha512_var<let N: u32>(msg: BoundedVec<u8, N>) -> [u8; 64] {
-        crate::digest_var::<_, 1_u1>(msg)
+        crate::digest_var::<_, true>(msg)
     }
 
     // Fuzz testing the sha512 implementation
@@ -288,7 +288,7 @@ pub mod sha512 {
 
 pub mod sha384 {
     pub fn digest<let N: u32>(msg: [u8; N]) -> [u8; 48] {
-        let full_result = crate::digest::<_, 0_u1>(msg);
+        let full_result = crate::digest::<_, false>(msg);
         let mut r: [u8; 48] = [0; 48];
         for i in 0..48 {
             r[i] = full_result[i];
@@ -297,7 +297,7 @@ pub mod sha384 {
     }
 
     pub fn sha384_var<let N: u32>(msg: BoundedVec<u8, N>) -> [u8; 48] {
-        let full_result = crate::digest_var::<_, 0_u1>(msg);
+        let full_result = crate::digest_var::<_, false>(msg);
         let mut r: [u8; 48] = [0; 48];
         for i in 0..48 {
             r[i] = full_result[i];
