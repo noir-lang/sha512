@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1775641274283,
+  "lastUpdate": 1775641276573,
   "repoUrl": "https://github.com/noir-lang/sha512",
   "entries": {
     "ACIR Opcodes": [
@@ -1314,6 +1314,105 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/noir-lang/sha512/commit/43852baefcd43fdd380b185bf63e91b24772dfa9"
         },
         "date": 1775639208588,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "bench_sha512_1_block",
+            "value": 13365,
+            "unit": "opcodes"
+          },
+          {
+            "name": "bench_sha512_2_blocks",
+            "value": 13506,
+            "unit": "opcodes"
+          },
+          {
+            "name": "bench_sha512_3_blocks",
+            "value": 13636,
+            "unit": "opcodes"
+          },
+          {
+            "name": "bench_sha512_4_blocks",
+            "value": 13763,
+            "unit": "opcodes"
+          },
+          {
+            "name": "bench_sha512_compression",
+            "value": 13046,
+            "unit": "opcodes"
+          },
+          {
+            "name": "bench_sha512_var_1_block",
+            "value": 13429,
+            "unit": "opcodes"
+          },
+          {
+            "name": "bench_sha512_var_2_blocks",
+            "value": 13571,
+            "unit": "opcodes"
+          },
+          {
+            "name": "bench_sha512_var_3_blocks",
+            "value": 13700,
+            "unit": "opcodes"
+          },
+          {
+            "name": "bench_sha512_var_4_blocks",
+            "value": 13827,
+            "unit": "opcodes"
+          },
+          {
+            "name": "test_sha384_1",
+            "value": 13586,
+            "unit": "opcodes"
+          },
+          {
+            "name": "test_sha384_100",
+            "value": 13456,
+            "unit": "opcodes"
+          },
+          {
+            "name": "test_sha384_256",
+            "value": 13626,
+            "unit": "opcodes"
+          },
+          {
+            "name": "test_sha512_1",
+            "value": 13548,
+            "unit": "opcodes"
+          },
+          {
+            "name": "test_sha512_100",
+            "value": 13418,
+            "unit": "opcodes"
+          },
+          {
+            "name": "test_sha512_256",
+            "value": 13588,
+            "unit": "opcodes"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "15848336+TomAFrench@users.noreply.github.com",
+            "name": "Tom French",
+            "username": "TomAFrench"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e92ffb473f3264529a0793770f63a09946df50cc",
+          "message": "feat: Remove duplicated decompose_witness call (#17)",
+          "timestamp": "2026-04-08T10:40:11+01:00",
+          "tree_id": "deb93fa5f5b31621336d009cf9dc11256592326d",
+          "url": "https://github.com/noir-lang/sha512/commit/e92ffb473f3264529a0793770f63a09946df50cc"
+        },
+        "date": 1775641276559,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
