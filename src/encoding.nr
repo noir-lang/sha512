@@ -216,7 +216,6 @@ pub(crate) fn encode_message_extension(w: Field) -> EncodedWitness {
     //        and we also need to validate the bit range of each slice
     //        (we get an implicit range constraint for free by indexing our BASE4_ENCODE_TABLE lookup tables)
     let s: [u32; 12] = unsafe { __decompose_witness(w) };
-    let s: [u32; 12] = unsafe { __decompose_witness(w) };
 
     // Validate the sum of the slices equals the original input `w`
     // Note: we range constrain the slices later on in the function
