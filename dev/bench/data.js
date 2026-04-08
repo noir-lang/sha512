@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1775641273362,
+  "lastUpdate": 1775641274283,
   "repoUrl": "https://github.com/noir-lang/sha512",
   "entries": {
     "ACIR Opcodes": [
@@ -817,6 +817,105 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/noir-lang/sha512/commit/43852baefcd43fdd380b185bf63e91b24772dfa9"
         },
         "date": 1775639206215,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "bench_sha512_1_block.json/main",
+            "value": 39746,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_2_blocks.json/main",
+            "value": 67362,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_3_blocks.json/main",
+            "value": 94976,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_4_blocks.json/main",
+            "value": 122592,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_compression.json/main",
+            "value": 40183,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_var_1_block.json/main",
+            "value": 44834,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_var_2_blocks.json/main",
+            "value": 76948,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_var_3_blocks.json/main",
+            "value": 109049,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_var_4_blocks.json/main",
+            "value": 141164,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "test_sha384_1.json/main",
+            "value": 44664,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "test_sha384_100.json/main",
+            "value": 44788,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "test_sha384_256.json/main",
+            "value": 108878,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "test_sha512_1.json/main",
+            "value": 44696,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "test_sha512_100.json/main",
+            "value": 44820,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "test_sha512_256.json/main",
+            "value": 108910,
+            "unit": "circuit_size"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "15848336+TomAFrench@users.noreply.github.com",
+            "name": "Tom French",
+            "username": "TomAFrench"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e92ffb473f3264529a0793770f63a09946df50cc",
+          "message": "feat: Remove duplicated decompose_witness call (#17)",
+          "timestamp": "2026-04-08T10:40:11+01:00",
+          "tree_id": "deb93fa5f5b31621336d009cf9dc11256592326d",
+          "url": "https://github.com/noir-lang/sha512/commit/e92ffb473f3264529a0793770f63a09946df50cc"
+        },
+        "date": 1775641274270,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
