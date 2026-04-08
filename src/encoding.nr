@@ -110,7 +110,7 @@ unconstrained fn __split_into_base4_5bit_slices(encoded: Field) -> [u32; 13] {
 /// Split an input Field element `e` (known to be 64 bits) into slices that can be efficiently composed to produce inputs to `EncodedChoose`
 unconstrained fn __decompose_e(e: Field) -> [u32; 9] {
     let mut r: [u32; 9] = [0; 9];
-    let mut bytes = e.to_le_bytes::<8>();
+    let bytes = e.to_le_bytes::<8>();
     let b8to14 = bytes[1] & 63;
     let b14to16 = bytes[1] >> 6;
     let b16to18 = bytes[2] & 3;
@@ -142,7 +142,7 @@ unconstrained fn __decompose_e(e: Field) -> [u32; 9] {
 /// Split an input Field element `a` (known to be 64 bits) into slices that can be efficiently composed to produce inputs to `EncodedMajority`
 unconstrained fn __decompose_a(a: Field) -> [u32; 9] {
     let mut r: [u32; 9] = [0; 9];
-    let mut bytes = a.to_le_bytes::<8>();
+    let bytes = a.to_le_bytes::<8>();
     let b24to28 = bytes[3] & 15;
     let b28to32 = bytes[3] >> 4;
     let b32to34 = bytes[4] & 3;
@@ -210,7 +210,7 @@ unconstrained fn __decompose_witness(w: Field) -> [u32; 12] {
 /// # Cost
 /// 40 gates
 pub(crate) fn encode_message_extension(w: Field) -> EncodedWitness {
-    //Safety: split input into slices with the following bit sizes:
+    // Safety: split input into slices with the following bit sizes:
     //   1, 5, 1, 1, 8, 3, 8, 8, 8, 9, 9, 3
     //        We need to validate the correctness of these slice claims by asserting their sum equals `w`,
     //        and we also need to validate the bit range of each slice
