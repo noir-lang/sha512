@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1773337900122,
+  "lastUpdate": 1775639205281,
   "repoUrl": "https://github.com/noir-lang/sha512",
   "entries": {
     "ACIR Opcodes": [
@@ -221,6 +221,105 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/noir-lang/sha512/commit/5e97f9731870f6d532258e455311e799cfd56ed7"
         },
         "date": 1773337896839,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "bench_sha512_1_block.json/main",
+            "value": 13216,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_2_blocks.json/main",
+            "value": 26101,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_3_blocks.json/main",
+            "value": 38986,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_4_blocks.json/main",
+            "value": 51871,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_compression.json/main",
+            "value": 13392,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_var_1_block.json/main",
+            "value": 14107,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_var_2_blocks.json/main",
+            "value": 27803,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_var_3_blocks.json/main",
+            "value": 41484,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_var_4_blocks.json/main",
+            "value": 55181,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "test_sha384_1.json/main",
+            "value": 13981,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "test_sha384_100.json/main",
+            "value": 14080,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "test_sha384_256.json/main",
+            "value": 41357,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "test_sha512_1.json/main",
+            "value": 13997,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "test_sha512_100.json/main",
+            "value": 14096,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "test_sha512_256.json/main",
+            "value": 41373,
+            "unit": "acir_opcodes"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "mvezenov@gmail.com",
+            "name": "Maxim Vezenov",
+            "username": "vezenovm"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "43852baefcd43fdd380b185bf63e91b24772dfa9",
+          "message": "fix: remove usage of u1 (#16)\n\nCo-authored-by: Tom French <15848336+TomAFrench@users.noreply.github.com>",
+          "timestamp": "2026-04-08T10:05:39+01:00",
+          "tree_id": "27e7b75533dd97ec97be5101cd77b8d67c4e9849",
+          "url": "https://github.com/noir-lang/sha512/commit/43852baefcd43fdd380b185bf63e91b24772dfa9"
+        },
+        "date": 1775639204358,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
