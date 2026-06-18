@@ -140,12 +140,12 @@ fn digest_var<let N: u32, let IS_SHA512: u8>(msg: BoundedVec<u8, N>) -> [u8; 64]
             * SHA512_BLOCK_SIZE
     ];
 
+    let msg_length = msg.len();
+
     let msg_text = msg.storage();
     for i in 0..N {
-        padded_msg[i] = msg_text[i];
+        padded_msg[i] = if i < msg_length { msg_text[i] } else { 0 };
     }
-
-    let msg_length = msg.len();
 
     let num_used_blocks =
         (msg_length + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE;
@@ -282,6 +282,23 @@ pub mod sha512 {
         ];
 
         assert_eq(result, expected);
+        assert_eq(result_var, expected);
+    }
+
+    #[test]
+    fn test_dirty_padding_ignored() {
+        let mut dirty: [u8; 256] = [0xff; 256];
+        dirty[0] = 0x61; // 'a'
+        dirty[1] = 0x62; // 'b'
+        dirty[2] = 0x63; // 'c'
+        let result_var = sha512_var(BoundedVec::<u8, 256>::from_parts_unchecked(dirty, 3));
+        let expected: [u8; 64] = [
+            0xdd, 0xaf, 0x35, 0xa1, 0x93, 0x61, 0x7a, 0xba, 0xcc, 0x41, 0x73, 0x49, 0xae, 0x20,
+            0x41, 0x31, 0x12, 0xe6, 0xfa, 0x4e, 0x89, 0xa9, 0x7e, 0xa2, 0x0a, 0x9e, 0xee, 0xe6,
+            0x4b, 0x55, 0xd3, 0x9a, 0x21, 0x92, 0x99, 0x2a, 0x27, 0x4f, 0xc1, 0xa8, 0x36, 0xba,
+            0x3c, 0x23, 0xa3, 0xfe, 0xeb, 0xbd, 0x45, 0x4d, 0x44, 0x23, 0x64, 0x3c, 0xe8, 0x0e,
+            0x2a, 0x9a, 0xc9, 0x4f, 0xa5, 0x4c, 0xa4, 0x9f,
+        ];
         assert_eq(result_var, expected);
     }
 
