@@ -140,12 +140,18 @@ fn digest_var<let N: u32, let IS_SHA512: u8>(msg: BoundedVec<u8, N>) -> [u8; 64]
             * SHA512_BLOCK_SIZE
     ];
 
-    let msg_text = msg.storage();
-    for i in 0..N {
-        padded_msg[i] = msg_text[i];
-    }
-
     let msg_length = msg.len();
+    let msg_text = msg.storage();
+
+    // Only copy the valid bytes from the BoundedVec.
+    // `in_range` is true for i < msg_length and false afterwards; it can only flip
+    // once (at i == msg_length), so maintaining it incrementally is cheaper than an
+    // independent `i < msg_length` comparison per byte.
+    let mut in_range: bool = true;
+    for i in 0..N {
+        in_range = in_range & (msg_length != i);
+        padded_msg[i] = if in_range { msg_text[i] } else { 0 };
+    }
 
     let num_used_blocks =
         (msg_length + SHA512_LENGTH_PARAMETER_BYTES + SHA512_BLOCK_SIZE) / SHA512_BLOCK_SIZE;
@@ -285,6 +291,34 @@ pub mod sha512 {
         assert_eq(result_var, expected);
     }
 
+    #[test]
+    fn test_var_digest_ignores_storage_past_len() {
+        let msg = "abc".as_bytes();
+        // Build a dirty vec through the safe public API: fill the vec to capacity
+        // with garbage, then pop back down to the real message. `pop` only
+        // decrements `len`, so the garbage stays in the backing store past the end.
+        let mut dirty: BoundedVec<u8, 256> = BoundedVec::from_array(msg);
+        for _ in 3..256 {
+            dirty.push(0xff);
+        }
+        for _ in 3..256 {
+            let _ = dirty.pop();
+        }
+        assert_eq(dirty.len(), 3);
+
+        let clean: BoundedVec<u8, 256> = BoundedVec::from_array(msg);
+        assert_eq(sha512_var(dirty), sha512_var(clean));
+
+        // SHA-512("abc") reference vector from FIPS 180-4
+        let expected: [u8; 64] = [
+            0xdd, 0xaf, 0x35, 0xa1, 0x93, 0x61, 0x7a, 0xba, 0xcc, 0x41, 0x73, 0x49, 0xae, 0x20,
+            0x41, 0x31, 0x12, 0xe6, 0xfa, 0x4e, 0x89, 0xa9, 0x7e, 0xa2, 0x0a, 0x9e, 0xee, 0xe6,
+            0x4b, 0x55, 0xd3, 0x9a, 0x21, 0x92, 0x99, 0x2a, 0x27, 0x4f, 0xc1, 0xa8, 0x36, 0xba,
+            0x3c, 0x23, 0xa3, 0xfe, 0xeb, 0xbd, 0x45, 0x4d, 0x44, 0x23, 0x64, 0x3c, 0xe8, 0x0e,
+            0x2a, 0x9a, 0xc9, 0x4f, 0xa5, 0x4c, 0xa4, 0x9f,
+        ];
+        assert_eq(sha512_var(dirty), expected);
+    }
 }
 
 pub mod sha384 {
@@ -390,5 +424,33 @@ pub mod sha384 {
 
         assert_eq(result, expected);
         assert_eq(result_var, expected);
+    }
+
+    #[test]
+    fn test_var_digest_ignores_storage_past_len() {
+        let msg = "abc".as_bytes();
+        // Build a dirty vec through the safe public API: fill the vec to capacity
+        // with garbage, then pop back down to the real message. `pop` only
+        // decrements `len`, so the garbage stays in the backing store past the end.
+        let mut dirty: BoundedVec<u8, 256> = BoundedVec::from_array(msg);
+        for _ in 3..256 {
+            dirty.push(0xff);
+        }
+        for _ in 3..256 {
+            let _ = dirty.pop();
+        }
+        assert_eq(dirty.len(), 3);
+
+        let clean: BoundedVec<u8, 256> = BoundedVec::from_array(msg);
+        assert_eq(sha384_var(dirty), sha384_var(clean));
+
+        // SHA-384("abc") reference vector from FIPS 180-4
+        let expected: [u8; 48] = [
+            0xcb, 0x00, 0x75, 0x3f, 0x45, 0xa3, 0x5e, 0x8b, 0xb5, 0xa0, 0x3d, 0x69, 0x9a, 0xc6,
+            0x50, 0x07, 0x27, 0x2c, 0x32, 0xab, 0x0e, 0xde, 0xd1, 0x63, 0x1a, 0x8b, 0x60, 0x5a,
+            0x43, 0xff, 0x5b, 0xed, 0x80, 0x86, 0x07, 0x2b, 0xa1, 0xe7, 0xcc, 0x23, 0x58, 0xba,
+            0xec, 0xa1, 0x34, 0xc8, 0x25, 0xa7,
+        ];
+        assert_eq(sha384_var(dirty), expected);
     }
 }
