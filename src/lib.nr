@@ -143,9 +143,14 @@ fn digest_var<let N: u32, let IS_SHA512: u8>(msg: BoundedVec<u8, N>) -> [u8; 64]
     let msg_length = msg.len();
     let msg_text = msg.storage();
 
-    // Only copy the valid bytes from the BoundedVec
+    // Only copy the valid bytes from the BoundedVec.
+    // `in_range` is true for i < msg_length and false afterwards; it can only flip
+    // once (at i == msg_length), so maintaining it incrementally is cheaper than an
+    // independent `i < msg_length` comparison per byte.
+    let mut in_range: bool = true;
     for i in 0..N {
-        padded_msg[i] = if i < msg_length { msg_text[i] } else { 0 };
+        in_range = in_range & (msg_length != i);
+        padded_msg[i] = if in_range { msg_text[i] } else { 0 };
     }
 
     let num_used_blocks =
