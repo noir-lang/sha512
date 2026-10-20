@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1775641276573,
+  "lastUpdate": 1792506268310,
   "repoUrl": "https://github.com/noir-lang/sha512",
   "entries": {
     "ACIR Opcodes": [
@@ -419,6 +419,105 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/noir-lang/sha512/commit/e92ffb473f3264529a0793770f63a09946df50cc"
         },
         "date": 1775641272913,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "bench_sha512_1_block.json/main",
+            "value": 13216,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_2_blocks.json/main",
+            "value": 26101,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_3_blocks.json/main",
+            "value": 38986,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_4_blocks.json/main",
+            "value": 51871,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_compression.json/main",
+            "value": 13392,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_var_1_block.json/main",
+            "value": 14107,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_var_2_blocks.json/main",
+            "value": 27803,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_var_3_blocks.json/main",
+            "value": 41484,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "bench_sha512_var_4_blocks.json/main",
+            "value": 55181,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "test_sha384_1.json/main",
+            "value": 13981,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "test_sha384_100.json/main",
+            "value": 14080,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "test_sha384_256.json/main",
+            "value": 41357,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "test_sha512_1.json/main",
+            "value": 13997,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "test_sha512_100.json/main",
+            "value": 14096,
+            "unit": "acir_opcodes"
+          },
+          {
+            "name": "test_sha512_256.json/main",
+            "value": 41373,
+            "unit": "acir_opcodes"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49558828+AztecBot@users.noreply.github.com",
+            "name": "Aztec Bot",
+            "username": "AztecBot"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "811b3780afb2c231d6a0bea3e833d02df1536af6",
+          "message": "chore: add experimental software warning to README (#21)",
+          "timestamp": "2026-10-20T15:23:25+01:00",
+          "tree_id": "0cc85c456b52ebe6b01d6e2174f601c74bcdfad0",
+          "url": "https://github.com/noir-lang/sha512/commit/811b3780afb2c231d6a0bea3e833d02df1536af6"
+        },
+        "date": 1792506267958,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
