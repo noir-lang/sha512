@@ -1,7 +1,9 @@
 # sha512
 
-> [!WARNING]  
-> This library has not been reviewed by the Noir team and is unaudited. Use at your own risk.
+> [!WARNING]
+> **This library is experimental software. It has not been fully audited and is not guaranteed to be secure. Expect bugs!**
+>
+> sha512 is provided "as is", without warranty of any kind (see [LICENSE](LICENSE)). Bugs in this library can lead to under-constrained circuits, allowing invalid proofs to be accepted. Do not rely on it to protect real assets or sensitive data without your own independent review.
 
 Library that implements SHA512 and SHA384
 
