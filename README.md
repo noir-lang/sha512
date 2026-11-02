@@ -9,7 +9,7 @@ Library that implements SHA512 and SHA384
 
 ## Noir version compatibility
 
-This library is tested against all stable versions of noir from 1.0.0-beta.5.
+This library is tested against all stable versions of noir from 1.0.0.
 
 ## Benchmarks
 
