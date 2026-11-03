@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793678380931,
+  "lastUpdate": 1793678382261,
   "repoUrl": "https://github.com/noir-lang/sha512",
   "entries": {
     "ACIR Opcodes": [
@@ -1411,6 +1411,105 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/noir-lang/sha512/commit/de8f20d4e64f46e0187b2db90240c2669f2fadfe"
         },
         "date": 1793627010586,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "bench_sha512_1_block.json/main",
+            "value": 26529,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_2_blocks.json/main",
+            "value": 44881,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_3_blocks.json/main",
+            "value": 63231,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_4_blocks.json/main",
+            "value": 81583,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_compression.json/main",
+            "value": 26771,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_var_1_block.json/main",
+            "value": 28209,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_var_2_blocks.json/main",
+            "value": 47732,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_var_3_blocks.json/main",
+            "value": 67239,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "bench_sha512_var_4_blocks.json/main",
+            "value": 86766,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "test_sha384_1.json/main",
+            "value": 28039,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "test_sha384_100.json/main",
+            "value": 28163,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "test_sha384_256.json/main",
+            "value": 67068,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "test_sha512_1.json/main",
+            "value": 28071,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "test_sha512_100.json/main",
+            "value": 28195,
+            "unit": "circuit_size"
+          },
+          {
+            "name": "test_sha512_256.json/main",
+            "value": 67100,
+            "unit": "circuit_size"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "mike@aztec.foundation",
+            "name": "Michael Connor",
+            "username": "iAmMichaelConnor"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "991e6b56a52809345db1c3cfd10243dbec56a52b",
+          "message": "fix(ci): start the oracle server in the nightly canary (#24)",
+          "timestamp": "2026-11-03T11:58:58+08:00",
+          "tree_id": "0121e1e3c8d5ed8bdfe0b91840cf8a73f8df8978",
+          "url": "https://github.com/noir-lang/sha512/commit/991e6b56a52809345db1c3cfd10243dbec56a52b"
+        },
+        "date": 1793678382253,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
