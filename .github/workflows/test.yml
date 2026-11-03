@@ -58,7 +58,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          yarn --immutable
+          yarn install --frozen-lockfile
 
       - name: Run all tests (including oracle tests)
         working-directory: ./scripts
